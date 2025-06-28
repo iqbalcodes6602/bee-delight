@@ -122,7 +122,7 @@ const removeFromWishlist = async (req, res) => {
     }
 
     wishlist.items = wishlist.items.filter(
-      item => item.product.toString() !== productId
+      item => item.product.id.toString() !== productId
     );
 
     await wishlist.save();

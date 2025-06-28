@@ -135,9 +135,11 @@ const Header = () => {
               </Link>
             )}
 
-            <Button variant="ghost" size="icon" className="text-amber-900 hover:text-amber-600">
-              <Heart className="h-5 w-5" />
-            </Button>
+            <Link to="/account?tab=wishlist">
+              <Button variant="ghost" size="icon" className="text-amber-900 hover:text-amber-600">
+                <Heart className="h-5 w-5" />
+              </Button>
+            </Link>
             
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="text-amber-900 hover:text-amber-600 relative">
