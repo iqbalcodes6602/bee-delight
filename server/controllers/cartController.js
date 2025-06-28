@@ -133,7 +133,7 @@ const updateCartItem = async (req, res) => {
     }
 
     const itemIndex = cart.items.findIndex(
-      item => item.product.toString() === productId
+      item => item.product._id.toString() === productId
     );
 
     if (itemIndex === -1) {
@@ -197,7 +197,7 @@ const removeFromCart = async (req, res) => {
     }
 
     cart.items = cart.items.filter(
-      item => item.product.toString() !== productId
+      item => item.product._id.toString() !== productId
     );
 
     await cart.save();

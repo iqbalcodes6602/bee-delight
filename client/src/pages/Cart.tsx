@@ -5,12 +5,25 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCartStore } from "@/stores/cartStore";
+import { useEffect } from "react";
 
 const Cart = () => {
   const { items, total, updateQuantity, removeItem } = useCartStore();
 
   const shipping = total > 50 ? 0 : 8.99;
   const finalTotal = total + shipping;
+
+  const fetchCart = async () => {
+    try {
+      await useCartStore.getState().fetchCart();
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
 
   if (items.length === 0) {
     return (

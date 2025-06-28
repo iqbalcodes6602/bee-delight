@@ -1,9 +1,9 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import axios from 'axios';
 
 interface CartItem {
-  id: number;
+  id: string;  // note: backend uses string ObjectId
   name: string;
   price: number;
   image: string;
@@ -14,11 +14,11 @@ interface CartItem {
 interface CartState {
   items: CartItem[];
   total: number;
-  addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
-  clearCart: () => void;
-  getItemCount: () => number;
+  fetchCart: () => Promise<void>;
+  addItem: (productId: string, quantity: number, size?: string) => Promise<void>;
+  updateQuantity: (id: string, quantity: number) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
+  clearCart: () => Promise<void>;
 }
 
 export const useCartStore = create<CartState>()(
@@ -26,54 +26,106 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       total: 0,
-      addItem: (item) => {
-        const existingItemIndex = get().items.findIndex(i => i.id === item.id && i.size === item.size);
-        
-        if (existingItemIndex >= 0) {
-          const newItems = [...get().items];
-          newItems[existingItemIndex].quantity += 1;
-          const newTotal = get().total + item.price;
-          
-          set({ items: newItems, total: newTotal });
-        } else {
-          const newItem = { ...item, quantity: 1 };
-          set((state) => ({
-            items: [...state.items, newItem],
-            total: state.total + item.price
-          }));
+
+      // fetch entire cart from backend
+      fetchCart: async () => {
+        try {
+          const res = await axios.get(`http://localhost:5000/api/cart`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          });
+          if (res.data.success) {
+            const cart = res.data.cart;
+            set({
+              items: cart.items,
+              total: cart.total
+            });
+          }
+        } catch (err) {
+          console.error("fetchCart error", err);
         }
       },
-      removeItem: (id) => {
-        const item = get().items.find(i => i.id === id);
-        if (item) {
-          set((state) => ({
-            items: state.items.filter(i => i.id !== id),
-            total: state.total - (item.price * item.quantity)
-          }));
+
+      // add item
+      addItem: async (product, quantity, size) => {
+        try {
+          console.log("Adding item to cart:", { product, quantity, size });
+          await axios.post(
+            `http://localhost:5000/api/cart/items`,
+            { productId: product.id, quantity, size },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+          // after adding, re-fetch
+          await get().fetchCart();
+        } catch (err) {
+          console.error("addItem error", err);
         }
       },
-      updateQuantity: (id, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(id);
-          return;
-        }
-        
-        const item = get().items.find(i => i.id === id);
-        if (item) {
-          const difference = quantity - item.quantity;
-          set((state) => ({
-            items: state.items.map(i =>
-              i.id === id ? { ...i, quantity } : i
-            ),
-            total: state.total + (item.price * difference)
-          }));
+
+      // update quantity
+      updateQuantity: async (id, quantity) => {
+        try {
+          await axios.put(
+            `http://localhost:5000/api/cart/items/${id}`,
+            { quantity },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+          await get().fetchCart();
+        } catch (err) {
+          console.error("updateQuantity error", err);
         }
       },
-      clearCart: () => set({ items: [], total: 0 }),
-      getItemCount: () => get().items.reduce((sum, item) => sum + item.quantity, 0)
+
+      // remove
+      removeItem: async (id) => {
+        try {
+          await axios.delete(
+            `http://localhost:5000/api/cart/items/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+          await get().fetchCart();
+        } catch (err) {
+          console.error("removeItem error", err);
+        }
+      },
+
+      // calculate total
+      getItemCount: () => {
+        return get().items.reduce((sum, item) => sum + item.quantity, 0);
+      },
+
+      // clear
+      clearCart: async () => {
+        try {
+          await axios.delete(
+            `http://localhost:5000/api/cart`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+          await get().fetchCart();
+        } catch (err) {
+          console.error("clearCart error", err);
+        }
+      },
     }),
     {
-      name: 'cart-storage'
+      name: 'cart-storage-sync'
     }
   )
 );
