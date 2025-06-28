@@ -27,13 +27,16 @@ interface ProductState {
   addProduct: (product: Omit<Product, "id" | "rating" | "reviews">) => Promise<void>;
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
-  getProduct: (id: string) => Product | undefined;
+  getProduct: (id: string) => Promise<Product | undefined>;
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
+  currentProduct: null,
+  loading: false,
+  error: null,
 
   fetchProducts: async (params = {}) => {
     try {
@@ -132,7 +135,31 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
-  getProduct: (id) => {
-    return get().products.find((p) => p.id === id);
-  },
+  getProduct: async (id: string) => {
+    set({ loading: true, error: null, currentProduct: null });
+    
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE}/products/${id}`, {
+        headers: { 
+          Authorization: `Bearer ${token}` 
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        set({ currentProduct: data.product });
+        return data.product; // Return the product directly
+      } else {
+        throw new Error(data.message || "Failed to fetch product");
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch product";
+      set({ error: errorMessage });
+      throw error; // Re-throw the error for component handling
+    } finally {
+      set({ loading: false });
+    }
+  }
 }));

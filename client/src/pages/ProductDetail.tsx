@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { useReviewStore } from "@/stores/reviewStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useToast } from "@/hooks/use-toast";
+import { useWishlistStore } from "@/stores/wishlistStore";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -20,11 +21,36 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
+  
 
-  const product = useProductStore((state) => state.getProduct(Number(id)));
   const addToCart = useCartStore((state) => state.addItem);
   const { user } = useAuthStore();
   const { getProductReviews, getProductRating, addReview } = useReviewStore();
+
+  const { getProduct } = useProductStore();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadProduct = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const fetchedProduct = await getProduct(id);
+        setProduct(fetchedProduct || null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load product');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [id, getProduct]);
 
   if (!product) {
     return (
@@ -119,6 +145,30 @@ const ProductDetail = () => {
     });
   };
 
+  const handleWishlist = () => {
+    if (!product) return;
+    
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast({
+        title: "Removed from wishlist",
+        description: `${product.name} has been removed from your wishlist.`,
+      });
+    } else {
+      addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image
+      });
+      toast({
+        title: "Added to wishlist!",
+        description: `${product.name} has been added to your wishlist.`,
+      });
+    }
+  };
+  const inWishlist = isInWishlist(product.id);
+
   return (
     <div className="min-h-screen bg-amber-50">
       <Header />
@@ -171,8 +221,9 @@ const ProductDetail = () => {
                 variant="ghost"
                 size="icon"
                 className="absolute top-4 right-4 bg-white/80 hover:bg-white"
+                onClick={handleWishlist}
               >
-                <Heart className="h-5 w-5" />
+                <Heart className={`h-5 w-5 ${inWishlist ? 'text-red-500 fill-red-500' : 'text-amber-600'}`} />
               </Button>
             </div>
 
@@ -292,8 +343,8 @@ const ProductDetail = () => {
                   <ShoppingCart className="h-5 w-5 mr-2" />
                   Add to Cart - ${totalPrice.toFixed(2)}
                 </Button>
-                <Button variant="outline" className="px-6">
-                  <Heart className="h-5 w-5" />
+                <Button variant="outline" className="px-6" onClick={handleWishlist}>
+                  <Heart className={`h-5 w-5 ${inWishlist ? 'text-red-500 fill-red-500' : 'text-amber-600'}`} />
                 </Button>
               </div>
 
