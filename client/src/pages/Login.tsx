@@ -31,7 +31,7 @@ const Login = () => {
       } else {
         toast({
           title: "Login failed",
-          description: "Invalid email or password. Try admin@goldenhive.com / admin123 or user@example.com / user123",
+          description: "Invalid email or password. Try admin@beedelight.com / admin123 or user@example.com / user123",
           variant: "destructive",
         });
       }
@@ -96,7 +96,7 @@ const Login = () => {
 
           <div className="mt-4 p-3 bg-amber-50 rounded-lg">
             <p className="text-xs text-amber-800 font-medium">Demo Accounts:</p>
-            <p className="text-xs text-amber-700">Admin: admin@goldenhive.com / admin123</p>
+            <p className="text-xs text-amber-700">Admin: admin@beedelight.com / admin123</p>
             <p className="text-xs text-amber-700">User: user@example.com / user123</p>
           </div>
         </CardContent>

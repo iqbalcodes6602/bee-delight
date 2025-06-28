@@ -59,7 +59,7 @@ if (process.env.NODE_ENV === 'development') {
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Golden Hive API is running',
+    message: 'Bee Delight API is running',
     timestamp: new Date().toISOString()
   });
 });
@@ -83,7 +83,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Golden Hive API server running on port ${PORT}`);
+  console.log(`🚀 Bee Delight API server running on port ${PORT}`);
   console.log(`📅 Started at: ${new Date().toLocaleString()}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

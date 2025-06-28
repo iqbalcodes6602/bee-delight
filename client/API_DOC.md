@@ -1,7 +1,7 @@
 More actions
-# Golden Hive - Complete Backend API Documentation
+# Bee Dlight - Complete Backend API Documentation
 
-This document outlines all the API endpoints required for the Golden Hive honey store application based on the frontend codebase analysis.
+This document outlines all the API endpoints required for the Bee Dlight honey store application based on the frontend codebase analysis.
 
 ## Table of Contents
 1. [Authentication](#authentication)

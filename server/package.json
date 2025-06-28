@@ -1,7 +1,7 @@
 {
-  "name": "golden-hive-backend",
+  "name": "bee-delight-backend",
   "version": "1.0.0",
-  "description": "Complete backend API for Golden Hive honey store",
+  "description": "Complete backend API for Bee Delight honey store",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -23,6 +23,6 @@
     "nodemon": "^3.0.1"
   },
   "keywords": ["nodejs", "express", "mongodb", "ecommerce", "api"],
-  "author": "Golden Hive",
+  "author": "GBee Delight",
   "license": "MIT"
 }

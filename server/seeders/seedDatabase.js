@@ -49,7 +49,7 @@ const seedUsers = async () => {
     const users = [
       {
         name: 'Admin User',
-        email: 'admin@goldenhive.com',
+        email: 'admin@beedelight.com',
         password: 'admin123',
         role: 'admin',
         phone: '+1234567890',
@@ -658,7 +658,7 @@ Each type of honey offers its own unique characteristics and benefits, making th
       },
       {
         title: 'Sustainable Beekeeping Practices',
-        content: `At Golden Hive, we're committed to sustainable beekeeping practices that protect both our bees and the environment. Here's how we ensure our honey production is ethical and environmentally responsible.
+        content: `At Bee Delight, we're committed to sustainable beekeeping practices that protect both our bees and the environment. Here's how we ensure our honey production is ethical and environmentally responsible.
 
 ## Our Commitment to Bee Welfare
 
@@ -703,7 +703,7 @@ We're constantly researching and implementing new sustainable practices:
 - Technology for hive monitoring
 - Collaboration with conservation organizations
 
-By choosing Golden Hive honey, you're supporting sustainable beekeeping practices that protect bees and preserve the environment for future generations.`,
+By choosing Bee Delighte honey, you're supporting sustainable beekeeping practices that protect bees and preserve the environment for future generations.`,
         excerpt: 'Learn about our commitment to sustainable beekeeping practices and how we protect both our bees and the environment.',
         image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
         author: users[0]._id, // Admin
@@ -884,7 +884,7 @@ const seedDatabase = async () => {
     console.log('🎫 Coupons: 5');
     
     console.log('\n🔑 Test Credentials:');
-    console.log('Admin: admin@goldenhive.com / admin123');
+    console.log('Admin: admin@beedelight.com / admin123');
     console.log('User: john@example.com / password123');
     console.log('User: jane@example.com / password123');
     

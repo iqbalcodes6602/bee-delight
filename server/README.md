@@ -1,6 +1,6 @@
-# Golden Hive - Backend API
+# Bee Delight - Backend API
 
-A complete Node.js backend API for the Golden Hive honey store e-commerce application built with Express.js and MongoDB.
+A complete Node.js backend API for the Bee Delight honey store e-commerce application built with Express.js and MongoDB.
 
 ## 🚀 Features
 
@@ -61,7 +61,7 @@ A complete Node.js backend API for the Golden Hive honey store e-commerce applic
    ```env
    NODE_ENV=development
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/golden_hive
+   MONGODB_URI=mongodb://localhost:27017/bee_delight
    JWT_SECRET=your_super_secret_jwt_key_here
    JWT_EXPIRE=30d
    CORS_ORIGIN=http://localhost:3000
@@ -190,4 +190,4 @@ For support or questions, please open an issue in the repository or contact the 
 
 ---
 
-**Golden Hive Backend API** - Built with ❤️ for e-commerce excellence
+**Bee Delight Backend API** - Built with ❤️ for e-commerce excellence

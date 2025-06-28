@@ -1,9 +1,9 @@
 {
   "info": {
-    "name": "Golden Hive API",
-    "description": "Complete API collection for Golden Hive honey store backend",
+    "name": "Bee Delight API",
+    "description": "Complete API collection for Bee Delight honey store backend",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_postman_id": "golden-hive-api-collection",
+    "_postman_id": "bee-delight-api-collection",
     "version": {
       "major": 1,
       "minor": 0,
@@ -152,7 +152,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@goldenhive.com\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\n  \"email\": \"admin@beedelight.com\",\n  \"password\": \"admin123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",

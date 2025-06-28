@@ -14,7 +14,7 @@ const AdminUsers = () => {
     {
       id: '1',
       name: 'Admin User',
-      email: 'admin@goldenhive.com',
+      email: 'admin@beedelight.com',
       role: 'admin',
       status: 'active',
       joinDate: '2024-01-01',
