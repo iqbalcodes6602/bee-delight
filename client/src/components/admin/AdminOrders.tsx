@@ -13,8 +13,9 @@ const AdminOrders = () => {
   const { toast } = useToast();
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-  const handleStatusChange = (orderId: string, newStatus: string) => {
-    updateOrderStatus(orderId, newStatus as any);
+  const handleStatusChange = (order, newStatus: string) => {
+    updateOrderStatus(order.id, newStatus as any);
+    order.status = newStatus; // Update local state for immediate feedback
     toast({ title: `Order status updated to ${newStatus}` });
   };
 
@@ -120,7 +121,7 @@ const AdminOrders = () => {
                                     key={status}
                                     size="sm"
                                     variant={selectedOrder.status === status ? "default" : "outline"}
-                                    onClick={() => handleStatusChange(selectedOrder.id, status)}
+                                    onClick={() => handleStatusChange(selectedOrder, status)}
                                   >
                                     {status.charAt(0).toUpperCase() + status.slice(1)}
                                   </Button>

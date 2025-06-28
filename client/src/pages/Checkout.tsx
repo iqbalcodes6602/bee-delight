@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,9 +26,9 @@ const Checkout = () => {
   
   const navigate = useNavigate();
   const { items, total, clearCart } = useCartStore();
-  const addOrder = useOrderStore((state) => state.addOrder);
-  const user = useAuthStore((state) => state.user);
-  const { validateCoupon, useCoupon } = useCouponStore();
+  const { createOrder } = useOrderStore();
+  const { user } = useAuthStore();
+  const { validateCoupon } = useCouponStore();
   const { toast } = useToast();
 
   const finalTotal = total - discount;
@@ -92,36 +91,21 @@ const Checkout = () => {
         id: item.id,
         name: item.name,
         price: item.price,
-        quantity: item.quantity
+        quantity: item.quantity,
+        image: item.image
       }));
 
-      const orderId = addOrder({
-        userId: user.id,
-        items: orderItems,
-        total: finalTotal,
-        status: 'pending',
-        shippingAddress: shippingInfo
-      });
-
-      // Use the coupon if one was applied
-      if (appliedCoupon) {
-        useCoupon(appliedCoupon);
-      }
+      const orderId = await createOrder(
+        orderItems,
+        finalTotal,
+        shippingInfo,
+        appliedCoupon || undefined
+      );
 
       clearCart();
-      
-      toast({
-        title: "Order placed successfully!",
-        description: `Your order #${orderId} has been placed.`,
-      });
-
-      navigate("/account");
+      navigate(`/account/orders/${orderId}`);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to place order. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Order placement error:", error);
     } finally {
       setIsLoading(false);
     }

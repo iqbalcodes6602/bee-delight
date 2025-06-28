@@ -1,11 +1,14 @@
-
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
 
 interface OrderItem {
-  id: number;
+  id: string;
   name: string;
   price: number;
   quantity: number;
+  image?: string;
 }
 
 interface Order {
@@ -22,76 +25,186 @@ interface Order {
     city: string;
     zipCode: string;
   };
+  trackingNumber?: string;
 }
 
 interface OrderState {
   orders: Order[];
-  addOrder: (order: Omit<Order, 'id' | 'createdAt'>) => string;
-  updateOrderStatus: (id: string, status: Order['status']) => void;
-  getUserOrders: (userId: string) => Order[];
-  getOrder: (id: string) => Order | undefined;
+  loading: boolean;
+  error: string | null;
+  fetchOrders: (userId: string) => Promise<void>;
+  getOrder: (orderId: string) => Promise<Order | null>;
+  createOrder: (
+    items: OrderItem[],
+    total: number,
+    shippingAddress: any,
+    couponCode?: string
+  ) => Promise<string>;
+  updateOrderStatus: (orderId: string, status: Order['status']) => Promise<void>;
 }
 
-const mockOrders: Order[] = [
-  {
-    id: 'order-1',
-    userId: '2',
-    items: [
-      { id: 1, name: 'Wildflower Raw Honey', price: 24.99, quantity: 2 },
-      { id: 2, name: 'Acacia Honey', price: 32.50, quantity: 1 }
-    ],
-    total: 82.48,
-    status: 'delivered',
-    createdAt: '2024-06-10T10:30:00Z',
-    shippingAddress: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      address: '123 Main St',
-      city: 'New York',
-      zipCode: '10001'
-    }
-  },
-  {
-    id: 'order-2',
-    userId: '2',
-    items: [
-      { id: 3, name: 'Manuka Honey', price: 48.00, quantity: 1 }
-    ],
-    total: 48.00,
-    status: 'shipped',
-    createdAt: '2024-06-14T15:45:00Z',
-    shippingAddress: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      address: '123 Main St',
-      city: 'New York',
-      zipCode: '10001'
-    }
-  }
-];
+export const useOrderStore = create<OrderState>()(
+  persist(
+    (set, get) => ({
+      orders: [],
+      loading: false,
+      error: null,
 
-export const useOrderStore = create<OrderState>((set, get) => ({
-  orders: mockOrders,
-  addOrder: (order) => {
-    const newOrder = {
-      ...order,
-      id: `order-${Date.now()}`,
-      createdAt: new Date().toISOString()
-    };
-    set((state) => ({ orders: [...state.orders, newOrder] }));
-    return newOrder.id;
-  },
-  updateOrderStatus: (id, status) => {
-    set((state) => ({
-      orders: state.orders.map(order =>
-        order.id === id ? { ...order, status } : order
-      )
-    }));
-  },
-  getUserOrders: (userId) => {
-    return get().orders.filter(order => order.userId === userId);
-  },
-  getOrder: (id) => {
-    return get().orders.find(order => order.id === id);
-  }
-}));
+      fetchOrders: async (userId) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) return;
+
+          const response = await axios.get('http://localhost:5000/api/orders', {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+
+          if (response.data.success) {
+            set({ orders: response.data.orders });
+          }
+        } catch (error: any) {
+          set({ error: error.response?.data?.message || 'Failed to fetch orders' });
+          useToast().toast({
+            title: "Error",
+            description: "Failed to load your orders",
+            variant: "destructive"
+          });
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      getOrder: async (orderId) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) return null;
+
+          const response = await axios.get(`http://localhost:5000/api/orders/${orderId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+
+          if (response.data.success) {
+            return response.data.order;
+          }
+          return null;
+        } catch (error: any) {
+          set({ error: error.response?.data?.message || 'Failed to fetch order' });
+          useToast().toast({
+            title: "Error",
+            description: "Failed to load order details",
+            variant: "destructive"
+          });
+          return null;
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      createOrder: async (items, total, shippingAddress, couponCode) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) throw new Error('No authentication token found');
+
+          const response = await axios.post(
+            'http://localhost:5000/api/orders',
+            {
+              items,
+              total,
+              shippingAddress,
+              couponCode
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              }
+            }
+          );
+
+          if (response.data.success) {
+            // Add the new order to local state
+            const newOrder = {
+              id: response.data.order.id,
+              userId: response.data.order.userId,
+              items,
+              total: response.data.order.total,
+              status: 'pending',
+              createdAt: new Date().toISOString(),
+              shippingAddress
+            };
+
+            set((state) => ({
+              orders: [...state.orders, newOrder]
+            }));
+
+            useToast().toast({
+              title: "Order placed!",
+              description: `Your order #${response.data.order.id} has been placed.`,
+            });
+
+            return response.data.order.id;
+          }
+          throw new Error('Failed to create order');
+        } catch (error: any) {
+          set({ error: error.response?.data?.message || 'Failed to create order' });
+          useToast().toast({
+            title: "Error",
+            description: error.response?.data?.message || 'Failed to place order',
+            variant: "destructive"
+          });
+          throw error;
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      updateOrderStatus: async (orderId, status) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) throw new Error('No authentication token found');
+
+          const response = await axios.put(
+            `http://localhost:5000/api/orders/${orderId}/status`,
+            { status },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              }
+            }
+          );
+
+          if (response.data.success) {
+            set((state) => ({
+              orders: state.orders.map(order =>
+                order.id === orderId ? { ...order, status } : order
+              )
+            }));
+          }
+        } catch (error: any) {
+          set({ error: error.response?.data?.message || 'Failed to update order status' });
+          useToast().toast({
+            title: "Error",
+            description: "Failed to update order status",
+            variant: "destructive"
+          });
+          throw error;
+        } finally {
+          set({ loading: false });
+        }
+      },
+    }),
+    {
+      name: 'order-storage',
+      partialize: (state) => ({ orders: state.orders }),
+    }
+  )
+);

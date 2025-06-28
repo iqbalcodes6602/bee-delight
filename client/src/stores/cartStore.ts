@@ -50,7 +50,6 @@ export const useCartStore = create<CartState>()(
       // add item
       addItem: async (product, quantity, size) => {
         try {
-          console.log("Adding item to cart:", { product, quantity, size });
           await axios.post(
             `http://localhost:5000/api/cart/items`,
             { productId: product.id, quantity, size },
