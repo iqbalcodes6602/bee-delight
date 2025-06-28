@@ -1,8 +1,7 @@
-
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   originalPrice?: number;
@@ -17,74 +16,123 @@ interface Product {
 
 interface ProductState {
   products: Product[];
-  addProduct: (product: Omit<Product, 'id'>) => void;
-  updateProduct: (id: number, product: Partial<Product>) => void;
-  deleteProduct: (id: number) => void;
-  getProduct: (id: number) => Product | undefined;
+  fetchProducts: (params?: {
+    category?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }) => Promise<void>;
+  addProduct: (product: Omit<Product, "id" | "rating" | "reviews">) => Promise<void>;
+  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  getProduct: (id: string) => Product | undefined;
 }
 
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: "Wildflower Raw Honey",
-    price: 24.99,
-    originalPrice: 29.99,
-    image: 'p1.webp',
-    rating: 4.8,
-    reviews: 127,
-    description: "Pure, unfiltered wildflower honey from local beekeepers",
-    badge: "Bestseller",
-    category: "Raw Honey",
-    stock: 45
-  },
-  {
-    id: 2,
-    name: "Acacia Honey",
-    price: 32.50,
-    image: 'p2.webp',
-    rating: 4.9,
-    reviews: 89,
-    description: "Light, delicate acacia honey with floral notes",
-    badge: "Premium",
-    category: "Premium Honey",
-    stock: 23
-  },
-  {
-    id: 3,
-    name: "Manuka Honey",
-    price: 48.00,
-    image: 'p3.png',
-    rating: 4.7,
-    reviews: 156,
-    description: "Authentic Manuka honey with natural antibacterial properties",
-    badge: "Premium",
-    category: "Premium Honey",
-    stock: 12
-  }
-];
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export const useProductStore = create<ProductState>((set, get) => ({
-  products: mockProducts,
-  addProduct: (product) => {
-    const newProduct = {
-      ...product,
-      id: Math.max(...get().products.map(p => p.id), 0) + 1
-    };
-    set((state) => ({ products: [...state.products, newProduct] }));
+  products: [],
+
+  fetchProducts: async (params = {}) => {
+    try {
+      const token = localStorage.getItem("token");
+      const query = new URLSearchParams();
+      if (params.category && params.category !== "all") query.append("category", params.category);
+      if (params.search) query.append("search", params.search);
+      if (params.page) query.append("page", String(params.page));
+      if (params.limit) query.append("limit", String(params.limit));
+      if (params.sortBy) query.append("sortBy", params.sortBy);
+      if (params.sortOrder) query.append("sortOrder", params.sortOrder);
+
+      const res = await fetch(`${API_BASE}/products?${query.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        set({ products: data.products });
+      } else {
+        console.error("Failed to fetch products", data);
+      }
+    } catch (err) {
+      console.error("Error fetching products", err);
+    }
   },
-  updateProduct: (id, updatedProduct) => {
-    set((state) => ({
-      products: state.products.map(product =>
-        product.id === id ? { ...product, ...updatedProduct } : product
-      )
-    }));
+
+  addProduct: async (product) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(product),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        set((state) => ({
+          products: [...state.products, data.product],
+        }));
+      } else {
+        console.error("Failed to add product", data);
+      }
+    } catch (err) {
+      console.error("Error adding product", err);
+    }
   },
-  deleteProduct: (id) => {
-    set((state) => ({
-      products: state.products.filter(product => product.id !== id)
-    }));
+
+  updateProduct: async (id, updates) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/products/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        set((state) => ({
+          products: state.products.map((p) =>
+            p.id === id ? { ...p, ...updates } : p
+          ),
+        }));
+      } else {
+        console.error("Failed to update product", data);
+      }
+    } catch (err) {
+      console.error("Error updating product", err);
+    }
   },
+
+  deleteProduct: async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/products/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        set((state) => ({
+          products: state.products.filter((p) => p.id !== id),
+        }));
+      } else {
+        console.error("Failed to delete product", data);
+      }
+    } catch (err) {
+      console.error("Error deleting product", err);
+    }
+  },
+
   getProduct: (id) => {
-    return get().products.find(product => product.id === id);
-  }
+    return get().products.find((p) => p.id === id);
+  },
 }));

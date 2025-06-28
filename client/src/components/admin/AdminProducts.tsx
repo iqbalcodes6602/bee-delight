@@ -193,6 +193,7 @@ const AdminProducts = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Image</TableHead>
               <TableHead>Product</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Category</TableHead>
@@ -205,7 +206,17 @@ const AdminProducts = () => {
               <TableRow key={product.id}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    <span className="text-2xl">{product.image}</span>
+                    <span className="text-2xl">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-8 h-8 rounded"
+                      />
+                      </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-3">
                     <div>
                       <p className="font-medium">{product.name}</p>
                       <p className="text-sm text-gray-500">{product.description}</p>
