@@ -1,4 +1,6 @@
 
+import { useToast } from '@/hooks/use-toast';
+import axios from 'axios';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -15,6 +17,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -88,6 +91,43 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error("Registration failed:", error);
           return false;
+        }
+      },
+      
+      changePassword: async (currentPassword, newPassword) => {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) throw new Error('No authentication token found');
+          
+          const response = await axios.put(
+            'http://localhost:5000/api/auth/password',
+            {
+              currentPassword,
+              newPassword
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              }
+            }
+          );
+
+          if (response.data.success) {
+            useToast().toast({
+              title: "Success",
+              description: "Password changed successfully",
+            });
+          } else {
+            throw new Error(response.data.message || 'Failed to change password');
+          }
+        } catch (error: any) {
+          useToast().toast({
+            title: "Error",
+            description: error.response?.data?.message || error.message || 'Failed to change password',
+            variant: "destructive"
+          });
+          throw error;
         }
       },
       logout: async () => {

@@ -1,34 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-
-interface Address {
-  id: number;
-  type: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  isDefault: boolean;
-}
+import { useUserStore } from "@/stores/userStore";
 
 export const AddressesTab = () => {
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: 1,
-      type: "Home",
-      address: "123 Honey Lane",
-      city: "Sweet Valley",
-      state: "CA",
-      zip: "90210",
-      isDefault: true
-    }
-  ]);
+  const { addresses, addAddress, deleteAddress, fetchAddresses } = useUserStore();
   const [newAddress, setNewAddress] = useState({
     type: "",
     address: "",
@@ -36,30 +16,14 @@ export const AddressesTab = () => {
     state: "",
     zip: ""
   });
-  const { toast } = useToast();
+
+    useEffect(() => {
+        fetchAddresses();
+    }, []);
 
   const handleAddAddress = () => {
-    if (newAddress.type && newAddress.address && newAddress.city && newAddress.state && newAddress.zip) {
-      const address = {
-        id: Date.now(),
-        ...newAddress,
-        isDefault: addresses.length === 0
-      };
-      setAddresses([...addresses, address]);
-      setNewAddress({ type: "", address: "", city: "", state: "", zip: "" });
-      toast({
-        title: "Address added!",
-        description: "New address has been added to your account.",
-      });
-    }
-  };
-
-  const removeAddress = (id: number) => {
-    setAddresses(addresses.filter(addr => addr.id !== id));
-    toast({
-      title: "Address removed",
-      description: "Address has been removed from your account.",
-    });
+    addAddress(newAddress);
+    setNewAddress({ type: "", address: "", city: "", state: "", zip: "" });
   };
 
   return (
@@ -70,7 +34,7 @@ export const AddressesTab = () => {
       <CardContent>
         <div className="space-y-4">
           {addresses.map((address) => (
-            <div key={address.id} className="border rounded-lg p-4">
+            <div key={address._id} className="border rounded-lg p-4">
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-semibold">{address.type} {address.isDefault && "(Default)"}</h3>
@@ -82,7 +46,7 @@ export const AddressesTab = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => removeAddress(address.id)}
+                  onClick={() => deleteAddress(address._id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -105,7 +69,7 @@ export const AddressesTab = () => {
                 <div>
                   <Label htmlFor="addressType">Address Type</Label>
                   <Input 
-                    id="addressType"
+                    id="type"
                     placeholder="e.g. Home, Work, etc."
                     value={newAddress.type}
                     onChange={(e) => setNewAddress({...newAddress, type: e.target.value})}
@@ -114,7 +78,7 @@ export const AddressesTab = () => {
                 <div>
                   <Label htmlFor="addressLine">Address</Label>
                   <Input 
-                    id="addressLine"
+                    id="address"
                     placeholder="Street address"
                     value={newAddress.address}
                     onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}

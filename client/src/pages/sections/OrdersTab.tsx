@@ -18,7 +18,7 @@ interface OrdersTabProps {
   orders: Order[];
 }
 
-export const OrdersTab = ({ orders }: OrdersTabProps) => {
+export const OrdersTab = ({ orders, setSearchParams }: OrdersTabProps) => {
   return (
     <Card>
       <CardHeader>
