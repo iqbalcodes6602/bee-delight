@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import { useBlogStore } from "@/stores/blogStore";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminBlogs = () => {
-  const { posts, addPost, updatePost, deletePost } = useBlogStore();
+  const { fetchAdminPosts, createPost, updatePost, deletePost, getPublishedPosts } = useBlogStore();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
@@ -22,6 +22,12 @@ const AdminBlogs = () => {
     published: false
   });
 
+  useEffect(() => {
+    fetchAdminPosts();
+  }, []);
+  
+  const posts = getPublishedPosts();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -32,7 +38,7 @@ const AdminBlogs = () => {
         description: "The blog post has been updated successfully.",
       });
     } else {
-      addPost(formData);
+      createPost(formData);
       toast({
         title: "Post created!",
         description: "The blog post has been created successfully.",

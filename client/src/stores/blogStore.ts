@@ -1,5 +1,5 @@
-
-import { create } from 'zustand';
+import { create } from "zustand";
+import axios from "axios";
 
 interface BlogPost {
   id: string;
@@ -14,63 +14,66 @@ interface BlogPost {
 
 interface BlogState {
   posts: BlogPost[];
-  addPost: (post: Omit<BlogPost, 'id' | 'createdAt'>) => void;
-  updatePost: (id: string, post: Partial<BlogPost>) => void;
-  deletePost: (id: string) => void;
+  fetchPublishedPosts: () => Promise<void>;
+  fetchAdminPosts: () => Promise<void>;
+  createPost: (post: Omit<BlogPost, 'id' | 'createdAt' | 'author'>) => Promise<void>;
+  updatePost: (id: string, post: Partial<BlogPost>) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
   getPost: (id: string) => BlogPost | undefined;
   getPublishedPosts: () => BlogPost[];
 }
 
-const mockPosts: BlogPost[] = [
-  {
-    id: '1',
-    title: 'The Health Benefits of Raw Honey',
-    content: 'Raw honey has been used for centuries for its medicinal properties. Unlike processed honey, raw honey retains all of its natural enzymes, antioxidants, and nutrients that make it a powerful superfood. Studies have shown that raw honey can help boost immunity, improve digestion, and even aid in wound healing. The antibacterial and antifungal properties of raw honey make it an excellent natural remedy for various ailments.',
-    excerpt: 'Discover the amazing health benefits of raw, unprocessed honey.',
-    image: '🍯',
-    author: 'Admin User',
-    createdAt: '2024-06-01T10:00:00Z',
-    published: true
-  },
-  {
-    id: '2',
-    title: 'How We Harvest Our Honey',
-    content: 'Our honey harvesting process is designed to maintain the highest quality while respecting our bee colonies. We use traditional methods combined with modern sustainable practices to ensure that our bees remain healthy and productive. The process begins early in the morning when the bees are less active, and we carefully extract only the excess honey, leaving plenty for the bees themselves.',
-    excerpt: 'Learn about our sustainable honey harvesting methods.',
-    image: '🐝',
-    author: 'Admin User',
-    createdAt: '2024-05-28T14:30:00Z',
-    published: true
-  }
-];
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+const token = localStorage.getItem("token");
 
 export const useBlogStore = create<BlogState>((set, get) => ({
-  posts: mockPosts,
-  addPost: (post) => {
-    const newPost: BlogPost = {
-      ...post,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
-    };
-    set((state) => ({ posts: [...state.posts, newPost] }));
+  posts: [],
+
+  fetchPublishedPosts: async () => {
+    const { data } = await axios.get("http://localhost:5000/api/blog/posts");
+    set({ posts: data.posts });
   },
-  updatePost: (id, updatedPost) => {
+
+  fetchAdminPosts: async () => {
+    const { data } = await axios.get("http://localhost:5000/api/blog/posts/admin", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    set({ posts: data.posts });
+  },
+
+  createPost: async (post) => {
+    const { data } = await axios.post("http://localhost:5000/api/blog/posts", post, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    set((state) => ({ posts: [...state.posts, data.post] }));
+  },
+
+  updatePost: async (id, updatedPost) => {
+    const { data } = await axios.put(`http://localhost:5000/api/blog/posts/${id}`, updatedPost, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     set((state) => ({
-      posts: state.posts.map(post =>
-        post.id === id ? { ...post, ...updatedPost } : post
-      )
+      posts: state.posts.map((post) =>
+        post.id === id ? data.post : post
+      ),
     }));
   },
-  deletePost: (id) => {
+
+  deletePost: async (id) => {
+    await axios.delete(`http://localhost:5000/api/blog/posts/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     set((state) => ({
-      posts: state.posts.filter(post => post.id !== id)
+      posts: state.posts.filter((post) => post.id !== id),
     }));
   },
+
   getPost: (id) => {
-    return get().posts.find(post => post.id === id);
+    return get().posts.find((post) => post.id === id);
   },
+
   getPublishedPosts: () => {
-    const posts = get().posts;
-    return posts;
-  }
+    return get().posts;
+  },
 }));

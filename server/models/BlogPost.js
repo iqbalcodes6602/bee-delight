@@ -20,11 +20,7 @@ const blogPostSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Blog post image is required']
   },
-  author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
+  author: { type: String, required: true },
   published: {
     type: Boolean,
     default: false

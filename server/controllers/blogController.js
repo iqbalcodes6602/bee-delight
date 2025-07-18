@@ -14,7 +14,7 @@ const getBlogPosts = async (req, res) => {
       content: post.content,
       excerpt: post.excerpt,
       image: post.image,
-      author: post.author.name,
+      author: post.author?.name,
       createdAt: post.createdAt,
       published: post.published
     }));
@@ -153,7 +153,7 @@ const updateBlogPost = async (req, res) => {
         content: post.content,
         excerpt: post.excerpt,
         image: post.image,
-        author: post.author.name,
+        author: post.author?.name,
         createdAt: post.createdAt,
         published: post.published
       }
@@ -187,7 +187,7 @@ const deleteBlogPost = async (req, res) => {
       });
     }
 
-    await post.remove();
+    await BlogPost.deleteOne({ _id: req.params.id });
 
     res.json({
       success: true,
@@ -219,7 +219,7 @@ const getAdminBlogPosts = async (req, res) => {
       content: post.content,
       excerpt: post.excerpt,
       image: post.image,
-      author: post.author.name,
+      author: post.author?.name,
       createdAt: post.createdAt,
       published: post.published
     }));

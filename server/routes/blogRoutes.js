@@ -13,11 +13,11 @@ const router = express.Router();
 
 // Public routes
 router.get('/posts', getBlogPosts);
+router.post('/posts', protect, adminOnly, createBlogPost);
+router.get('/posts/admin', protect, adminOnly, getAdminBlogPosts);
 router.get('/posts/:id', getBlogPost);
 
 // Admin routes
-router.get('/posts/admin', protect, adminOnly, getAdminBlogPosts);
-router.post('/posts', protect, adminOnly, createBlogPost);
 router.put('/posts/:id', protect, adminOnly, updateBlogPost);
 router.delete('/posts/:id', protect, adminOnly, deleteBlogPost);
 

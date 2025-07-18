@@ -5,9 +5,15 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useBlogStore } from "@/stores/blogStore";
+import { useEffect } from "react";
 
 const Blog = () => {
-  const posts = useBlogStore((state) => state.getPublishedPosts());
+  const { fetchPublishedPosts, getPublishedPosts } = useBlogStore();
+  useEffect(() => {
+    fetchPublishedPosts();
+  }, []);
+  const posts = getPublishedPosts();
+
 
   return (
     <div className="min-h-screen bg-amber-50">
