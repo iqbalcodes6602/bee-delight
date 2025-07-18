@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,19 +10,15 @@ import { useProductStore } from "@/stores/productStore";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminReviews = () => {
-  const { reviews, deleteReview } = useReviewStore();
   const { products } = useProductStore();
   const { toast } = useToast();
 
-  const handleDeleteReview = (reviewId: string) => {
-    if (confirm("Are you sure you want to delete this review?")) {
-      deleteReview(reviewId);
-      toast({
-        title: "Review deleted!",
-        description: "The review has been deleted successfully.",
-      });
-    }
-  };
+  const { reviews, fetchAllReviews, deleteReview } = useReviewStore();
+
+  useEffect(() => {
+    fetchAllReviews();
+  }, []);
+
 
   const getProductName = (productId: number) => {
     const product = products.find(p => p.id === productId);
@@ -87,7 +83,7 @@ const AdminReviews = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDeleteReview(review.id)}
+                        onClick={() => deleteReview(review.id)}
                         className="text-red-600 hover:text-red-700"
                       >
                         <Trash2 className="h-4 w-4" />

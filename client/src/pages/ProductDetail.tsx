@@ -26,12 +26,19 @@ const ProductDetail = () => {
 
   const addToCart = useCartStore((state) => state.addItem);
   const { user } = useAuthStore();
-  const { getProductReviews, getProductRating, addReview } = useReviewStore();
+  const { reviews, fetchReviews, getProductRating, addReview } = useReviewStore();
 
   const { getProduct } = useProductStore();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (product?.id) {
+      fetchReviews(product.id);
+    }
+  }, [product?.id]);
+
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -67,8 +74,7 @@ const ProductDetail = () => {
     );
   }
 
-  const reviews = getProductReviews(product.id);
-  const { averageRating, totalReviews } = getProductRating(product.id);
+  const { averageRating, totalReviews } = getProductRating();
 
   // Mock multiple images for carousel
   const productImages = [
@@ -429,33 +435,37 @@ const ProductDetail = () => {
               )}
 
               {/* Reviews List */}
-              <div className="space-y-4 max-h-96 overflow-y-auto">
-                {reviews.map((review) => (
-                  <div key={review.id} className="border-b border-amber-100 pb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-semibold text-amber-900">{review.userName}</h5>
-                      <span className="text-sm text-gray-500">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="flex items-center mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-gray-700">{review.comment}</p>
-                  </div>
-                ))}
-                
-                {reviews.length === 0 && (
-                  <p className="text-gray-500 text-center py-8">No reviews yet. Be the first to review this product!</p>
-                )}
-              </div>
+              {/* Reviews List */}
+<div className="space-y-4 max-h-96 overflow-y-auto">
+  {reviews.length > 0 ? (
+    reviews.map((review) => (
+      <div key={review.id} className="border-b border-amber-100 pb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h5 className="font-semibold text-amber-900">{review.userName}</h5>
+          <span className="text-sm text-gray-500">
+            {new Date(review.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+        <div className="flex items-center mb-2">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              className={`h-4 w-4 ${
+                i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"
+              }`}
+            />
+          ))}
+        </div>
+        <p className="text-gray-700">{review.comment}</p>
+      </div>
+    ))
+  ) : (
+    <p className="text-gray-500 text-center py-8">
+      No reviews yet. Be the first to review this product!
+    </p>
+  )}
+</div>
+
             </div>
           </div>
         </div>

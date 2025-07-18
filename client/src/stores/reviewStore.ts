@@ -1,9 +1,9 @@
-
 import { create } from 'zustand';
+import axios from 'axios';
 
 interface Review {
   id: string;
-  productId: number;
+  productId: string;
   userId: string;
   userName: string;
   rating: number;
@@ -13,69 +13,60 @@ interface Review {
 
 interface ReviewState {
   reviews: Review[];
-  addReview: (review: Omit<Review, 'id' | 'createdAt'>) => void;
-  deleteReview: (id: string) => void;
-  getProductReviews: (productId: number) => Review[];
-  getProductRating: (productId: number) => { averageRating: number; totalReviews: number };
+  fetchReviews: (productId: string) => Promise<void>;
+  fetchAllReviews: () => Promise<void>;
+  addReview: (review: { productId: string; rating: number; comment: string }) => Promise<void>;
+  deleteReview: (id: string) => Promise<void>;
+  getProductRating: () => { averageRating: number; totalReviews: number };
 }
 
-const mockReviews: Review[] = [
-  {
-    id: '1',
-    productId: 1,
-    userId: '2',
-    userName: 'John Doe',
-    rating: 5,
-    comment: 'Amazing quality honey! Pure and delicious.',
-    createdAt: '2024-06-10T10:30:00Z'
-  },
-  {
-    id: '2',
-    productId: 1,
-    userId: '3',
-    userName: 'Sarah Smith',
-    rating: 4,
-    comment: 'Great honey, love the wildflower taste.',
-    createdAt: '2024-06-12T14:20:00Z'
-  },
-  {
-    id: '3',
-    productId: 2,
-    userId: '2',
-    userName: 'John Doe',
-    rating: 5,
-    comment: 'The acacia honey is incredibly smooth and light.',
-    createdAt: '2024-06-11T09:15:00Z'
-  }
-];
+const token = localStorage.getItem('token');
 
 export const useReviewStore = create<ReviewState>((set, get) => ({
-  reviews: mockReviews,
-  addReview: (review) => {
-    const newReview = {
-      ...review,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
-    };
-    set((state) => ({ reviews: [...state.reviews, newReview] }));
+  reviews: [],
+
+  fetchReviews: async (productId: string) => {
+    const response = await axios.get(`http://localhost:5000/api/reviews/product/${productId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    set({ reviews: response.data.reviews });
   },
-  deleteReview: (id) => {
+
+  fetchAllReviews: async () => {
+    const response = await axios.get(`http://localhost:5000/api/reviews`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    set({ reviews: response.data.reviews });
+  },
+
+  addReview: async (review) => {
+    const response = await axios.post(`http://localhost:5000/api/reviews`, review, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
+    });
     set((state) => ({
-      reviews: state.reviews.filter(review => review.id !== id)
+      reviews: [...state.reviews, response.data.review]
     }));
   },
-  getProductReviews: (productId) => {
-    return get().reviews.filter(review => review.productId === productId);
+
+  deleteReview: async (id: string) => {
+    await axios.delete(`http://localhost:5000/api/reviews/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    set((state) => ({
+      reviews: state.reviews.filter((r) => r.id !== id)
+    }));
   },
-  getProductRating: (productId) => {
-    const productReviews = get().reviews.filter(review => review.productId === productId);
-    if (productReviews.length === 0) {
-      return { averageRating: 0, totalReviews: 0 };
-    }
-    const totalRating = productReviews.reduce((sum, review) => sum + review.rating, 0);
+
+  getProductRating: () => {
+    const reviews = get().reviews;
+    if (reviews.length === 0) return { averageRating: 0, totalReviews: 0 };
+    const totalRating = reviews.reduce((acc, cur) => acc + cur.rating, 0);
     return {
-      averageRating: totalRating / productReviews.length,
-      totalReviews: productReviews.length
+      averageRating: Number((totalRating / reviews.length).toFixed(1)),
+      totalReviews: reviews.length
     };
   }
 }));

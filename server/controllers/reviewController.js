@@ -126,7 +126,7 @@ const deleteReview = async (req, res) => {
       });
     }
 
-    await review.remove();
+    await Review.deleteOne({ _id: req.params.id });
 
     res.json({
       success: true,
@@ -155,10 +155,10 @@ const getAllReviews = async (req, res) => {
 
     const reviewsData = reviews.map(review => ({
       id: review._id,
-      productId: review.product._id,
-      productName: review.product.name,
-      userId: review.user._id,
-      userName: review.user.name,
+      productId: review.product?._id,
+      productName: review.product?.name,
+      userId: review.user?._id,
+      userName: review.user?.name,
       rating: review.rating,
       comment: review.comment,
       createdAt: review.createdAt
