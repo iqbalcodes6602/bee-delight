@@ -37,8 +37,8 @@ const Checkout = () => {
     setShippingInfo(prev => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleApplyCoupon = () => {
-    const result = validateCoupon(couponCode, total);
+  const handleApplyCoupon = async () => {
+    const result = await validateCoupon(couponCode, total);
     
     if (result.valid) {
       setAppliedCoupon(couponCode);

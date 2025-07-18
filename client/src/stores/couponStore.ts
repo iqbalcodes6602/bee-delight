@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 
 interface Coupon {
@@ -8,7 +7,7 @@ interface Coupon {
   discountType: 'percentage' | 'fixed';
   discountValue: number;
   minOrderAmount: number;
-  maxUses: number;
+  maxUses: number | null;
   currentUses: number;
   validFrom: string;
   validTo: string;
@@ -17,109 +16,83 @@ interface Coupon {
 
 interface CouponState {
   coupons: Coupon[];
-  addCoupon: (coupon: Omit<Coupon, 'id' | 'currentUses'>) => void;
-  updateCoupon: (id: string, coupon: Partial<Coupon>) => void;
-  deleteCoupon: (id: string) => void;
-  getCoupon: (code: string) => Coupon | undefined;
-  validateCoupon: (code: string, orderAmount: number) => { valid: boolean; discount: number; message: string };
-  useCoupon: (code: string) => void;
+  fetchCoupons: () => Promise<void>;
+  addCoupon: (coupon: Omit<Coupon, 'id' | 'currentUses'>) => Promise<void>;
+  updateCoupon: (id: string, coupon: Partial<Coupon>) => Promise<void>;
+  deleteCoupon: (id: string) => Promise<void>;
+  validateCoupon: (code: string, orderAmount: number) => Promise<{ valid: boolean; discount: number; message: string }>;
+  useCoupon: (code: string) => Promise<void>;
 }
 
-const mockCoupons: Coupon[] = [
-  {
-    id: '1',
-    code: 'HONEY20',
-    description: '20% off on all honey products',
-    discountType: 'percentage',
-    discountValue: 20,
-    minOrderAmount: 50,
-    maxUses: 100,
-    currentUses: 25,
-    validFrom: '2024-01-01T00:00:00Z',
-    validTo: '2024-12-31T23:59:59Z',
-    isActive: true
-  },
-  {
-    id: '2',
-    code: 'SAVE10',
-    description: '$10 off on orders above $75',
-    discountType: 'fixed',
-    discountValue: 10,
-    minOrderAmount: 75,
-    maxUses: 50,
-    currentUses: 12,
-    validFrom: '2024-01-01T00:00:00Z',
-    validTo: '2024-12-31T23:59:59Z',
-    isActive: true
-  }
-];
+const token = localStorage.getItem('token');
 
 export const useCouponStore = create<CouponState>((set, get) => ({
-  coupons: mockCoupons,
-  addCoupon: (coupon) => {
-    const newCoupon: Coupon = {
-      ...coupon,
-      id: Date.now().toString(),
-      currentUses: 0
-    };
-    set((state) => ({ coupons: [...state.coupons, newCoupon] }));
+  coupons: [],
+
+  fetchCoupons: async () => {
+    const res = await fetch('http://localhost:5000/api/coupons', {
+      headers: { Authorization: `Bearer ${token}`},
+    });
+    const data = await res.json();
+    set({ coupons: data.coupons });
   },
-  updateCoupon: (id, updatedCoupon) => {
-    set((state) => ({
-      coupons: state.coupons.map(coupon =>
-        coupon.id === id ? { ...coupon, ...updatedCoupon } : coupon
-      )
-    }));
+
+  addCoupon: async (coupon) => {
+    await fetch('http://localhost:5000/api/coupons', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(coupon),
+    });
+    await get().fetchCoupons();
   },
-  deleteCoupon: (id) => {
-    set((state) => ({
-      coupons: state.coupons.filter(coupon => coupon.id !== id)
-    }));
+
+  updateCoupon: async (id, updatedCoupon) => {
+    await fetch(`http://localhost:5000/api/coupons/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(updatedCoupon),
+    });
+    await get().fetchCoupons();
   },
-  getCoupon: (code) => {
-    return get().coupons.find(coupon => coupon.code.toLowerCase() === code.toLowerCase());
+
+  deleteCoupon: async (id) => {
+    await fetch(`http://localhost:5000/api/coupons/${id}`, {
+      method: 'DELETE',
+      headers: { 
+        Authorization: `Bearer ${token}`
+      },
+    });
+    await get().fetchCoupons();
   },
-  validateCoupon: (code, orderAmount) => {
-    const coupon = get().getCoupon(code);
-    
-    if (!coupon) {
-      return { valid: false, discount: 0, message: 'Invalid coupon code' };
-    }
-    
-    if (!coupon.isActive) {
-      return { valid: false, discount: 0, message: 'Coupon is not active' };
-    }
-    
-    const now = new Date();
-    const validFrom = new Date(coupon.validFrom);
-    const validTo = new Date(coupon.validTo);
-    
-    if (now < validFrom || now > validTo) {
-      return { valid: false, discount: 0, message: 'Coupon has expired or not yet valid' };
-    }
-    
-    if (coupon.currentUses >= coupon.maxUses) {
-      return { valid: false, discount: 0, message: 'Coupon usage limit exceeded' };
-    }
-    
-    if (orderAmount < coupon.minOrderAmount) {
-      return { valid: false, discount: 0, message: `Minimum order amount is $${coupon.minOrderAmount}` };
-    }
-    
-    const discount = coupon.discountType === 'percentage' 
-      ? (orderAmount * coupon.discountValue) / 100
-      : coupon.discountValue;
-    
-    return { valid: true, discount, message: 'Coupon applied successfully!' };
+
+  validateCoupon: async (code, orderAmount) => {
+    const res = await fetch('http://localhost:5000/api/coupons/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ code, orderAmount }),
+    });
+    const data = await res.json();
+    return { valid: data.valid, discount: data.discount, message: data.message };
   },
-  useCoupon: (code) => {
-    const coupon = get().getCoupon(code);
-    if (coupon) {
-      set((state) => ({
-        coupons: state.coupons.map(c =>
-          c.id === coupon.id ? { ...c, currentUses: c.currentUses + 1 } : c
-        )
-      }));
-    }
-  }
+
+  useCoupon: async (code) => {
+    await fetch('http://localhost:5000/api/coupons/use', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ code }),
+    });
+    await get().fetchCoupons();
+  },
 }));

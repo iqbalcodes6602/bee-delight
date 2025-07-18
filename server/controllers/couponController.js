@@ -138,7 +138,7 @@ const deleteCoupon = async (req, res) => {
       });
     }
 
-    await coupon.remove();
+    await Coupon.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const AdminCoupons = () => {
   const { toast } = useToast();
-  const { coupons, addCoupon, updateCoupon, deleteCoupon } = useCouponStore();
+  const { coupons, addCoupon, updateCoupon, deleteCoupon, fetchCoupons } = useCouponStore();
   const [showForm, setShowForm] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -45,17 +45,17 @@ const AdminCoupons = () => {
     setEditingCoupon(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (editingCoupon) {
-      updateCoupon(editingCoupon, formData);
+      await updateCoupon(editingCoupon, formData);
       toast({
         title: "Coupon updated!",
         description: "The coupon has been updated successfully.",
       });
     } else {
-      addCoupon(formData);
+      await addCoupon(formData);
       toast({
         title: "Coupon created!",
         description: "The new coupon has been created successfully.",
@@ -64,6 +64,10 @@ const AdminCoupons = () => {
     
     resetForm();
   };
+
+  useEffect(() => {
+    fetchCoupons();
+  }, []);
 
   const handleEdit = (coupon: any) => {
     setFormData({
@@ -81,8 +85,8 @@ const AdminCoupons = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteCoupon(id);
+  const handleDelete = async (id: string) => {
+    await deleteCoupon(id);
     toast({
       title: "Coupon deleted!",
       description: "The coupon has been deleted successfully.",
