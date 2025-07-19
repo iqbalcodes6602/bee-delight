@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,36 +9,55 @@ import { Badge } from "@/components/ui/badge";
 import { useProductStore } from "@/stores/productStore";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { ProductForm } from "./ProductForm";
 
 const AdminProducts = () => {
-  const { products, addProduct, updateProduct, deleteProduct, fetchProducts } = useProductStore();
+  const products = useProductStore((state) => state.products);
+  const addProduct = useProductStore((state) => state.addProduct);
+  const updateProduct = useProductStore((state) => state.updateProduct);
+  const deleteProduct = useProductStore((state) => state.deleteProduct);
+  const fetchProducts = useProductStore((state) => state.fetchProducts);
+
   const { toast } = useToast();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    originalPrice: '',
-    image: '',
-    description: '',
-    category: '',
-    stock: '100'
-  });
+
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [originalPrice, setOriginalPrice] = useState('');
+  const [image, setImage] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
+  const [stock, setStock] = useState('100');
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  const resetForm = () => {
+    setName('');
+    setPrice('');
+    setOriginalPrice('');
+    setImage('');
+    setDescription('');
+    setCategory('');
+    setStock('100');
+    setSelectedProduct(null);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const productData = {
-      ...formData,
-      price: parseFloat(formData.price),
-      originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
+      name,
+      price: parseFloat(price),
+      originalPrice: originalPrice ? parseFloat(originalPrice) : undefined,
+      image,
+      description,
+      category,
       rating: 4.5,
       reviews: 0,
-      stock: parseInt(formData.stock)
+      stock: parseInt(stock)
     };
 
     if (selectedProduct) {
@@ -51,21 +69,18 @@ const AdminProducts = () => {
       toast({ title: "Product added successfully" });
       setIsAddDialogOpen(false);
     }
-
     resetForm();
   };
 
   const handleEdit = (product: any) => {
     setSelectedProduct(product);
-    setFormData({
-      name: product.name,
-      price: product.price.toString(),
-      originalPrice: product.originalPrice?.toString() || '',
-      image: product.image,
-      description: product.description,
-      category: product.category || '',
-      stock: product.stock?.toString() || '100'
-    });
+    setName(product.name);
+    setPrice(product.price.toString());
+    setOriginalPrice(product.originalPrice?.toString() || '');
+    setImage(product.image);
+    setDescription(product.description);
+    setCategory(product.category || '');
+    setStock(product.stock?.toString() || '100');
     setIsEditDialogOpen(true);
   };
 
@@ -73,104 +88,6 @@ const AdminProducts = () => {
     deleteProduct(productId);
     toast({ title: "Product deleted successfully" });
   };
-
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      price: '',
-      originalPrice: '',
-      image: '',
-      description: '',
-      category: '',
-      stock: '100'
-    });
-    setSelectedProduct(null);
-  };
-
-  const ProductForm = () => (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="name">Product Name</Label>
-        <Input
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="price">Price</Label>
-          <Input
-            id="price"
-            type="number"
-            step="0.01"
-            value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="originalPrice">Original Price (Optional)</Label>
-          <Input
-            id="originalPrice"
-            type="number"
-            step="0.01"
-            value={formData.originalPrice}
-            onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="image">Image (Emoji or URL)</Label>
-          <Input
-            id="image"
-            value={formData.image}
-            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-            placeholder="🍯 or image URL"
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="stock">Stock Quantity</Label>
-          <Input
-            id="stock"
-            type="number"
-            value={formData.stock}
-            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-            required
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          required
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="category">Category</Label>
-        <Input
-          id="category"
-          value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-          placeholder="e.g., Raw Honey, Infused Honey"
-        />
-      </div>
-
-      <Button type="submit" className="w-full">
-        {selectedProduct ? 'Update Product' : 'Add Product'}
-      </Button>
-    </form>
-  );
 
   return (
     <div className="space-y-4">
@@ -188,7 +105,24 @@ const AdminProducts = () => {
               <DialogTitle>Add New Product</DialogTitle>
               <DialogDescription>Add a new honey product to your store</DialogDescription>
             </DialogHeader>
-            <ProductForm />
+            <ProductForm
+              onSubmit={handleSubmit}
+              name={name}
+              setName={setName}
+              price={price}
+              setPrice={setPrice}
+              originalPrice={originalPrice}
+              setOriginalPrice={setOriginalPrice}
+              image={image}
+              setImage={setImage}
+              description={description}
+              setDescription={setDescription}
+              category={category}
+              setCategory={setCategory}
+              stock={stock}
+              setStock={setStock}
+              selectedProduct={selectedProduct}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -210,13 +144,7 @@ const AdminProducts = () => {
               <TableRow key={product.id}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    <span className="text-2xl">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-8 h-8 rounded"
-                      />
-                      </span>
+                    <img src={product.image} alt={product.name} className="w-8 h-8 rounded" />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -231,16 +159,12 @@ const AdminProducts = () => {
                   <div>
                     <p className="font-medium">${product.price}</p>
                     {product.originalPrice && (
-                      <p className="text-sm text-gray-500 line-through">
-                        ${product.originalPrice}
-                      </p>
+                      <p className="text-sm text-gray-500 line-through">${product.originalPrice}</p>
                     )}
                   </div>
                 </TableCell>
                 <TableCell>
-                  {product.category && (
-                    <Badge variant="outline">{product.category}</Badge>
-                  )}
+                  {product.category && <Badge variant="outline">{product.category}</Badge>}
                 </TableCell>
                 <TableCell>
                   <Badge className={product.stock > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
@@ -263,14 +187,30 @@ const AdminProducts = () => {
         </Table>
       </div>
 
-      {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update product information</DialogDescription>
           </DialogHeader>
-          <ProductForm />
+          <ProductForm
+            onSubmit={handleSubmit}
+            name={name}
+            setName={setName}
+            price={price}
+            setPrice={setPrice}
+            originalPrice={originalPrice}
+            setOriginalPrice={setOriginalPrice}
+            image={image}
+            setImage={setImage}
+            description={description}
+            setDescription={setDescription}
+            category={category}
+            setCategory={setCategory}
+            stock={stock}
+            setStock={setStock}
+            selectedProduct={selectedProduct}
+          />
         </DialogContent>
       </Dialog>
     </div>

@@ -32,7 +32,9 @@ const Blog = () => {
             {posts.map((post) => (
               <article key={post.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div className="p-6 text-center bg-gradient-to-br from-amber-50 to-yellow-50">
-                  <div className="text-6xl mb-4">{post.image}</div>
+                  <div className="text-6xl mb-4">
+                    <img src={post.image} />
+                  </div>
                 </div>
                 
                 <div className="p-6">

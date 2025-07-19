@@ -70,7 +70,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-amber-100">
+    <div className="flex flex-col justify-between group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-amber-100">
       {/* Make the entire card clickable */}
       <Link to={`/product/${product.id}`} className="block">
         {/* Image container */}
@@ -84,9 +84,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {product.badge && (
             <Badge 
               className={`absolute top-4 left-4 ${
-                product.badge === 'Bestseller' ? 'bg-amber-500' :
-                product.badge === 'Premium' ? 'bg-purple-500' :
-                product.badge === 'New' ? 'bg-green-500' : 'bg-blue-500'
+                product.badge?.toLowerCase() === 'bestseller' ? 'bg-amber-500' :
+                product.badge?.toLowerCase() === 'premium' ? 'bg-purple-500' :
+                product.badge?.toLowerCase() === 'new' ? 'bg-red-500' :
+                product.badge?.toLowerCase() === 'organic' ? 'bg-green-500' :
+                'bg-blue-500'
               }`}
             >
               {product.badge}

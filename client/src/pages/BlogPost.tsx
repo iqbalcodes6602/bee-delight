@@ -41,7 +41,9 @@ const BlogPost = () => {
           {/* Hero Section */}
           <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
             <div className="p-12 text-center bg-gradient-to-br from-amber-50 to-yellow-50">
-              <div className="text-8xl mb-6">{post.image}</div>
+              <div className="text-8xl mb-6">
+                <img src={post.image} />
+              </div>
               <h1 className="text-4xl font-bold text-amber-900 mb-4">{post.title}</h1>
               
               <div className="flex items-center justify-center space-x-6 text-amber-700">

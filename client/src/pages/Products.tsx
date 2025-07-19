@@ -8,12 +8,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { useProductStore } from "@/stores/productStore";
+import { useSearchParams } from "react-router-dom";
 
 const Products = () => {
+  const [searchParams] = useSearchParams();
+  
+  const searchQuery = searchParams.get("search") || "";
   const products = useProductStore((state) => state.products);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
-
-  const [searchTerm, setSearchTerm] = useState("");
+  
+  const [searchTerm, setSearchTerm] = useState(searchQuery);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -27,6 +31,15 @@ const Products = () => {
       sortOrder,
     });
   }, [searchTerm, selectedCategory, sortBy, sortOrder]);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const prices = products.map((p) => p.price);
+      const min = Math.floor(Math.min(...prices));
+      const max = Math.ceil(Math.max(...prices));
+      setPriceRange([min, max]);
+    }
+  }, [products]);
 
   // get price extents
   const priceExtents = useMemo(() => {

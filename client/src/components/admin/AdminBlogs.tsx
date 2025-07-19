@@ -186,7 +186,9 @@ const AdminBlogs = () => {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
-                    <span className="text-2xl">{post.image}</span>
+                    <span className="text-xl">
+                      <img src={post.image} className="w-8 h-8 rounded" />
+                    </span>
                     <h3 className="text-lg font-semibold text-amber-900">{post.title}</h3>
                     <Badge variant={post.published ? "default" : "secondary"}>
                       {post.published ? "Published" : "Draft"}

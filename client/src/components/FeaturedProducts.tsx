@@ -1,50 +1,21 @@
-
+import { useEffect, useMemo } from "react";
+import { useProductStore } from "@/stores/productStore";
 import ProductCard from "@/components/ProductCard";
+import { Link } from "react-router-dom";
+
 
 const FeaturedProducts = () => {
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Wildflower Raw Honey",
-      price: 24.99,
-      originalPrice: 29.99,
-      image: "/p1.webp",
-      rating: 4.8,
-      reviews: 127,
-      description: "A delicate blend of wildflower nectar",
-      badge: "Bestseller"
-    },
-    {
-      id: 2,
-      name: "Manuka Honey Premium",
-      price: 89.99,
-      image: "/p2.webp",
-      rating: 4.9,
-      reviews: 203,
-      description: "Premium grade Manuka honey from New Zealand",
-      badge: "Premium"
-    },
-    {
-      id: 3,
-      name: "Lavender Infused Honey",
-      price: 32.99,
-      image: "/p3.png",
-      rating: 4.7,
-      reviews: 89,
-      description: "Soothing lavender essence in pure honey",
-      badge: "New"
-    },
-    {
-      id: 4,
-      name: "Clover Blossom Honey",
-      price: 19.99,
-      image: "/p4.png",
-      rating: 4.6,
-      reviews: 156,
-      description: "Classic light and mild clover honey",
-      badge: null
-    }
-  ];
+  const { products, fetchProducts } = useProductStore();
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const featuredProducts = useMemo(() => {
+    const withBadge = products.filter((p) => p.badge);
+    const withoutBadge = products.filter((p) => !p.badge);
+    return [...withBadge, ...withoutBadge].slice(0, 4);
+  }, [products]);
 
   return (
     <section className="py-20 bg-white">
@@ -65,9 +36,11 @@ const FeaturedProducts = () => {
         </div>
 
         <div className="text-center mt-12">
-          <button className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
-            View All Products
-          </button>
+          <Link to="/products">
+            <button className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+              View All Products
+            </button>
+          </Link>
         </div>
       </div>
     </section>

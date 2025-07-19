@@ -66,6 +66,9 @@ const Header = () => {
                   autoFocus
                 />
               </div>
+              <Button type="submit" variant="default" className="ml-2" style={{backgroundColor: "rgb(217 119 8)"}}>
+                Search
+              </Button>
               <Button type="button" variant="ghost" onClick={() => setShowSearch(false)} className="ml-2">
                 <X className="h-4 w-4" />
               </Button>
@@ -178,6 +181,9 @@ const Header = () => {
                   autoFocus
                 />
               </div>
+              <Button type="submit" variant="default" className="ml-2" style={{backgroundColor: "rgb(217 119 8)"}}>
+                Search
+              </Button>
               <Button type="button" variant="ghost" onClick={() => setShowSearch(false)}>
                 <X className="h-4 w-4" />
               </Button>
