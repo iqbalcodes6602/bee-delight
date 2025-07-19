@@ -1,56 +1,67 @@
-
-import { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useOrderStore } from "@/stores/orderStore";
-import { UserCheck, UserX } from "lucide-react";
+import { useAdminStore } from "@/stores/adminStore";
+import { UserCheck, UserX, Trash2 } from "lucide-react";
 
 const AdminUsers = () => {
-  const orders = useOrderStore((state) => state.orders);
-  
-  // Mock users data based on orders
-  const users = [
-    {
-      id: '1',
-      name: 'Admin User',
-      email: 'admin@beedelight.com',
-      role: 'admin',
-      status: 'active',
-      joinDate: '2024-01-01',
-      totalOrders: 0,
-      totalSpent: 0
-    },
-    {
-      id: '2',
-      name: 'John Doe',
-      email: 'user@example.com',
-      role: 'user',
-      status: 'active',
-      joinDate: '2024-05-15',
-      totalOrders: orders.filter(order => order.userId === '2').length,
-      totalSpent: orders.filter(order => order.userId === '2').reduce((sum, order) => sum + order.total, 0)
+  const { users, fetchUsers, stats, updateUser, deleteUser } = useAdminStore();
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  if (!users || !stats) return null;
+
+  const userData = users.map((user) => {
+    const userOrders = stats.totalOrders.filter(
+      (order: any) => order.user._id === user.id
+    );
+    const totalOrders = userOrders.length;
+    const totalSpent = userOrders.reduce(
+      (sum: number, order: any) => sum + (order.total || 0),
+      0
+    );
+
+    return {
+      ...user,
+      totalOrders,
+      totalSpent,
+    };
+  });
+
+  const getRoleColor = (role: string) =>
+    role === "admin"
+      ? "bg-purple-100 text-purple-800"
+      : "bg-blue-100 text-blue-800";
+
+  const getStatusColor = (isActive: boolean) =>
+    isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+
+  const handleToggleStatus = (user: any) => {
+    updateUser(user.id, {
+      role: user.role,
+      isActive: !user.isActive,
+    });
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      deleteUser(userId);
     }
-  ];
-
-  const handleStatusToggle = (userId: string) => {
-    console.log(`Toggle status for user ${userId}`);
-    // In a real app, this would call an API
-  };
-
-  const getRoleColor = (role: string) => {
-    return role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800';
-  };
-
-  const getStatusColor = (status: string) => {
-    return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Users</h3>
-      </div>
+      <h3 className="text-lg font-semibold">Users</h3>
 
       <div className="border rounded-lg">
         <Table>
@@ -66,7 +77,7 @@ const AdminUsers = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {userData.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
                   <div>
@@ -80,29 +91,38 @@ const AdminUsers = () => {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getStatusColor(user.status)}>
-                    {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                  <Badge className={getStatusColor(user.isActive)}>
+                    {user.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  {new Date(user.joinDate).toLocaleDateString()}
+                  {new Date(user.createdAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell>{user.totalOrders}</TableCell>
                 <TableCell>${user.totalSpent.toFixed(2)}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    {user.role !== 'admin' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleStatusToggle(user.id)}
-                      >
-                        {user.status === 'active' ? (
-                          <UserX className="h-4 w-4" />
-                        ) : (
-                          <UserCheck className="h-4 w-4" />
-                        )}
-                      </Button>
+                    {user.role !== "admin" && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleToggleStatus(user)}
+                        >
+                          {user.isActive ? (
+                            <UserX className="h-4 w-4" />
+                          ) : (
+                            <UserCheck className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </TableCell>
@@ -120,16 +140,20 @@ const AdminUsers = () => {
             <p className="text-sm text-amber-600">Total Users</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-amber-800">{users.filter(u => u.status === 'active').length}</p>
+            <p className="text-2xl font-bold text-amber-800">
+              {users.filter((u) => u.isActive).length}
+            </p>
             <p className="text-sm text-amber-600">Active Users</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-amber-800">{users.filter(u => u.role === 'admin').length}</p>
+            <p className="text-2xl font-bold text-amber-800">
+              {users.filter((u) => u.role === "admin").length}
+            </p>
             <p className="text-sm text-amber-600">Admins</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-amber-800">
-              {users.reduce((sum, user) => sum + user.totalOrders, 0)}
+              {userData.reduce((sum, user) => sum + user.totalOrders, 0)}
             </p>
             <p className="text-sm text-amber-600">Total Orders</p>
           </div>

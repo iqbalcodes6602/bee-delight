@@ -186,7 +186,8 @@ const getDashboardStats = async (req, res) => {
       { $group: { _id: null, total: { $sum: '$total' } } }
     ]);
 
-    const totalOrders = await Order.countDocuments();
+    // const totalOrders = await Order.find();
+    const totalOrders = await Order.find().select('status');
     const totalProducts = await Product.countDocuments({ isActive: true });
     const totalUsers = await User.countDocuments({ role: 'user' });
 

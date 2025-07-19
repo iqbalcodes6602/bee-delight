@@ -1,43 +1,36 @@
-
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useProductStore } from "@/stores/productStore";
-import { useOrderStore } from "@/stores/orderStore";
-import { useReviewStore } from "@/stores/reviewStore";
-import { useAuthStore } from "@/stores/authStore";
+import { useAdminStore } from "@/stores/adminStore";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const AdminStats = () => {
-  const { products } = useProductStore();
-  const { orders } = useOrderStore();
-  const { reviews } = useReviewStore();
+  const { stats, fetchStats } = useAdminStore();
 
-  // Calculate statistics
-  const totalProducts = products.length;
-  const totalOrders = orders.length;
-  const totalReviews = reviews.length;
-  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
-  // Order status breakdown
+  if (!stats) return null;
+
+  const totalRevenue = stats.totalRevenue || 0;
+  const totalOrders = stats.totalOrders.length;
+  const totalProducts = stats.totalProducts || 0;
+  const totalUsers = stats.totalUsers || 0;
+
   const orderStatusData = [
-    { name: 'Pending', value: orders.filter(o => o.status === 'pending').length, color: '#f59e0b' },
-    { name: 'Processing', value: orders.filter(o => o.status === 'processing').length, color: '#3b82f6' },
-    { name: 'Shipped', value: orders.filter(o => o.status === 'shipped').length, color: '#8b5cf6' },
-    { name: 'Delivered', value: orders.filter(o => o.status === 'delivered').length, color: '#10b981' },
-    { name: 'Cancelled', value: orders.filter(o => o.status === 'cancelled').length, color: '#ef4444' }
+    { name: 'Pending', value: stats.totalOrders.filter(o => o.status === 'pending').length, color: '#f59e0b' },
+    { name: 'Processing', value: stats.totalOrders.filter(o => o.status === 'processing').length, color: '#3b82f6' },
+    { name: 'Shipped', value: stats.totalOrders.filter(o => o.status === 'shipped').length, color: '#8b5cf6' },
+    { name: 'Delivered', value: stats.totalOrders.filter(o => o.status === 'delivered').length, color: '#10b981' },
+    { name: 'Cancelled', value: stats.totalOrders.filter(o => o.status === 'cancelled').length, color: '#ef4444' }
   ];
 
-  // Most sold products (mock data based on orders)
-  const productSalesData = products.slice(0, 5).map(product => ({
+  const productSalesData = stats.popularProducts.map(product => ({
     name: product.name.length > 15 ? product.name.substring(0, 15) + '...' : product.name,
-    sales: Math.floor(Math.random() * 50) + 10, // Mock sales data
+    sales: product.totalSold,
   }));
-
-  // Average rating
-  const averageRating = reviews.length > 0
-    ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
-    : 0;
 
   const chartConfig = {
     sales: {
@@ -48,7 +41,6 @@ const AdminStats = () => {
 
   return (
     <div className="space-y-6">
-      {/* Key Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -57,7 +49,7 @@ const AdminStats = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">${totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">From {totalOrders} orders</p>
+            <p className="text-xs text-muted-foreground">Revenue from {totalOrders} orders</p>
           </CardContent>
         </Card>
 
@@ -85,19 +77,18 @@ const AdminStats = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
-            <span className="text-2xl">⭐</span>
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <span className="text-2xl">👥</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-500">{averageRating}/5</div>
-            <p className="text-xs text-muted-foreground">From {totalReviews} reviews</p>
+            <div className="text-2xl font-bold text-blue-600">{totalUsers}</div>
+            <p className="text-xs text-muted-foreground">Registered users</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Order Status Chart */}
+        {/* Order Status Breakdown */}
         <Card>
           <CardHeader>
             <CardTitle>Order Status Breakdown</CardTitle>
@@ -124,7 +115,6 @@ const AdminStats = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </ChartContainer>
-
             </div>
             <div className="flex flex-wrap gap-2 mt-4">
               {orderStatusData.map((item) => (
@@ -140,7 +130,7 @@ const AdminStats = () => {
           </CardContent>
         </Card>
 
-        {/* Top Products Chart */}
+        {/* Top Selling Products */}
         <Card>
           <CardHeader>
             <CardTitle>Top Selling Products</CardTitle>

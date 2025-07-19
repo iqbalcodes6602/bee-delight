@@ -30,9 +30,11 @@ interface Order {
 
 interface OrderState {
   orders: Order[];
+  adminOrders: Order[];
   loading: boolean;
   error: string | null;
   fetchOrders: (userId: string) => Promise<void>;
+  fetchAdminOrders: () => Promise<void>;
   getOrder: (orderId: string) => Promise<Order | null>;
   createOrder: (
     items: OrderItem[],
@@ -47,8 +49,36 @@ export const useOrderStore = create<OrderState>()(
   persist(
     (set, get) => ({
       orders: [],
+      adminOrders: [],
       loading: false,
       error: null,
+
+      fetchAdminOrders: async () => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) return;
+
+          const response = await axios.get('http://localhost:5000/api/admin/orders', {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+
+          if (response.data.success) {
+            set({ adminOrders: response.data.orders });
+          }
+        } catch (error: any) {
+          set({ error: error.response?.data?.message || 'Failed to fetch orders' });
+          useToast().toast({
+            title: "Error",
+            description: "Failed to load your orders",
+            variant: "destructive"
+          });
+        } finally {
+          set({ loading: false });
+        }
+      },
 
       fetchOrders: async (userId) => {
         set({ loading: true, error: null });

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,9 +9,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, Package } from "lucide-react";
 
 const AdminOrders = () => {
-  const { orders, updateOrderStatus } = useOrderStore();
+  const { adminOrders, updateOrderStatus, fetchAdminOrders } = useOrderStore();
   const { toast } = useToast();
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  useEffect(() => {
+    fetchAdminOrders();
+  }, []);
 
   const handleStatusChange = (order, newStatus: string) => {
     updateOrderStatus(order.id, newStatus as any);
@@ -50,7 +54,7 @@ const AdminOrders = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {adminOrders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-mono text-sm">{order.id}</TableCell>
                 <TableCell>
