@@ -82,11 +82,11 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Bee Delight API server running on port ${PORT}`);
-  console.log(`📅 Started at: ${new Date().toLocaleString()}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`🚀 Bee Delight API server running on port ${PORT}`);
+//   console.log(`📅 Started at: ${new Date().toLocaleString()}`);
+//   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+// });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
@@ -96,3 +96,14 @@ process.on('unhandledRejection', (err, promise) => {
     process.exit(1);
   });
 });
+
+// At the end of server.js:
+
+if (process.env.RUN_LOCAL === 'true') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Bee Delight API running on port ${PORT}`);
+  });
+}
+
+module.exports = app; // Export the Express app for serverless

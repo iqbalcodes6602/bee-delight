@@ -1,0 +1,26 @@
+service: bee-delight-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+
+functions:
+  api:
+    handler: src/handler.handler
+    events:
+      - httpApi: '*'
+
+plugins:
+  - serverless-offline
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - 'node_modules/serverless-http/**'
+    - 'src/**'
+    - 'server.js'
+    - 'config/**'
+    - 'routes/**'
+    - 'middleware/**'
+    - '.env'
