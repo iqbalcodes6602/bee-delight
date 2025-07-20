@@ -296,7 +296,7 @@ const ProductDetail = () => {
                 </div>
                 
                 <div className="flex items-center space-x-3 mb-6">
-                  <span className="text-3xl font-bold text-amber-900">${totalPrice.toFixed(2)}</span>
+                  <span className="text-3xl font-bold text-amber-900">Rs. {totalPrice.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -315,7 +315,7 @@ const ProductDetail = () => {
                       }`}
                     >
                       <div className="font-medium">{size.name}</div>
-                      <div className="text-sm text-gray-600">${size.price.toFixed(2)}</div>
+                      <div className="text-sm text-gray-600">Rs. {size.price.toFixed(2)}</div>
                     </button>
                   ))}
                 </div>
@@ -347,7 +347,7 @@ const ProductDetail = () => {
               <div className="flex space-x-4 mb-6">
                 <Button onClick={handleAddToCart} className="flex-1 bg-amber-600 hover:bg-amber-700">
                   <ShoppingCart className="h-5 w-5 mr-2" />
-                  Add to Cart - ${totalPrice.toFixed(2)}
+                  Add to Cart - Rs. {totalPrice.toFixed(2)}
                 </Button>
                 <Button variant="outline" className="px-6" onClick={handleWishlist}>
                   <Heart className={`h-5 w-5 ${inWishlist ? 'text-red-500 fill-red-500' : 'text-amber-600'}`} />
@@ -359,7 +359,7 @@ const ProductDetail = () => {
                 <div className="text-center">
                   <Truck className="h-6 w-6 text-amber-600 mx-auto mb-2" />
                   <div className="text-sm font-medium">Free Shipping</div>
-                  <div className="text-xs text-gray-600">On orders $50+</div>
+                  <div className="text-xs text-gray-600">On orders Rs.50+</div>
                 </div>
                 <div className="text-center">
                   <Shield className="h-6 w-6 text-amber-600 mx-auto mb-2" />

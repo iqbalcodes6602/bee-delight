@@ -155,7 +155,7 @@ const Checkout = () => {
                           {item.size && <p className="text-sm text-gray-600">Size: {item.size}</p>}
                         </div>
                       </div>
-                      <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-bold">Rs. {(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   ))}
                   
@@ -178,7 +178,7 @@ const Checkout = () => {
                       <div className="flex items-center justify-between bg-green-100 p-3 rounded-lg">
                         <div>
                           <span className="font-medium text-green-800">Coupon Applied: {appliedCoupon}</span>
-                          <div className="text-sm text-green-600">Discount: -${discount.toFixed(2)}</div>
+                          <div className="text-sm text-green-600">Discount: -Rs. {discount.toFixed(2)}</div>
                         </div>
                         <Button onClick={removeCoupon} variant="ghost" size="sm">
                           Remove
@@ -191,17 +191,17 @@ const Checkout = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Subtotal:</span>
-                      <span>${total.toFixed(2)}</span>
+                      <span>Rs. {total.toFixed(2)}</span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-green-600">
                         <span>Discount:</span>
-                        <span>-${discount.toFixed(2)}</span>
+                        <span>-Rs. {discount.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
                       <span>Total:</span>
-                      <span>${finalTotal.toFixed(2)}</span>
+                      <span>Rs. {finalTotal.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -269,7 +269,7 @@ const Checkout = () => {
                     className="w-full bg-amber-600 hover:bg-amber-700"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Placing Order..." : `Place Order - $${finalTotal.toFixed(2)}`}
+                    {isLoading ? "Placing Order..." : `Place Order - Rs. ${finalTotal.toFixed(2)}`}
                   </Button>
                 </form>
               </CardContent>

@@ -40,7 +40,7 @@ const Header = () => {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       {/* Top banner */}
       <div className="bg-amber-600 text-white text-center py-2 text-sm">
-        🍯 Free shipping on orders over $50 | Pure, raw honey from our family to yours
+        🍯 Free shipping on orders over Rs.50 | Pure, raw honey from our family to yours
       </div>
       
       <div className="container mx-auto px-4">

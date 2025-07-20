@@ -71,7 +71,7 @@ const Cart = () => {
                     <div className="flex-1">
                       <h3 className="font-semibold text-amber-900">{item.name}</h3>
                       {item.size && <p className="text-gray-600 text-sm">{item.size}</p>}
-                      <p className="text-lg font-bold text-amber-700">${item.price.toFixed(2)}</p>
+                      <p className="text-lg font-bold text-amber-700">Rs. {item.price.toFixed(2)}</p>
                     </div>
 
                     <div className="flex items-center space-x-3">
@@ -96,7 +96,7 @@ const Cart = () => {
 
                     <div className="text-right">
                       <p className="font-bold text-amber-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        Rs. {(item.price * item.quantity).toFixed(2)}
                       </p>
                       <Button
                         variant="ghost"
@@ -121,11 +121,11 @@ const Cart = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>Rs. {total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? 'Free' : `Rs. ${shipping.toFixed(2)}`}</span>
                 </div>
                 {shipping === 0 && (
                   <p className="text-green-600 text-sm">🎉 You qualify for free shipping!</p>
@@ -133,7 +133,7 @@ const Cart = () => {
                 <div className="border-t pt-4">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>${finalTotal.toFixed(2)}</span>
+                    <span>Rs. {finalTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
