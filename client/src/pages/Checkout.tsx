@@ -148,7 +148,7 @@ const Checkout = () => {
                   {items.map((item) => (
                     <div key={item.id} className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <span className="text-2xl"><img src={item.image} className="w-12 h-12 rounded" /></span>
+                        <span className="text-2xl"><img src={item.images[0]} className="w-12 h-12 rounded" /></span>
                         <div>
                           <p className="font-medium">{item.name}</p>
                           <p className="text-sm text-gray-600">Qty: {item.quantity}</p>

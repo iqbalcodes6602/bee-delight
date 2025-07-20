@@ -19,7 +19,7 @@ const getWishlist = async (req, res) => {
       id: item.product._id,
       name: item.product.name,
       price: item.product.price,
-      image: item.product.image
+      images: item.product.images,
     }));
 
     res.json({

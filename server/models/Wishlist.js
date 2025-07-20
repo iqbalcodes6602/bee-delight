@@ -29,7 +29,7 @@ wishlistSchema.index({ user: 1, 'items.product': 1 }, { unique: true, sparse: tr
 wishlistSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'items.product',
-    select: 'name price image'
+    select: 'name price images'
   });
   next();
 });

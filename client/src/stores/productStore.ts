@@ -5,7 +5,7 @@ interface Product {
   name: string;
   price: number;
   originalPrice?: number;
-  image: string;
+  images: string;
   rating: number;
   reviews: number;
   description: string;

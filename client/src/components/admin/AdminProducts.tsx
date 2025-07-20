@@ -26,7 +26,7 @@ const AdminProducts = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [originalPrice, setOriginalPrice] = useState('');
-  const [image, setImage] = useState('');
+  const [images, setImages] = useState([""]); // Start with one field
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [stock, setStock] = useState('100');
@@ -39,7 +39,7 @@ const AdminProducts = () => {
     setName('');
     setPrice('');
     setOriginalPrice('');
-    setImage('');
+    setImages([""]);
     setDescription('');
     setCategory('');
     setStock('100');
@@ -52,7 +52,7 @@ const AdminProducts = () => {
       name,
       price: parseFloat(price),
       originalPrice: originalPrice ? parseFloat(originalPrice) : undefined,
-      image,
+      images,
       description,
       category,
       rating: 4.5,
@@ -77,7 +77,7 @@ const AdminProducts = () => {
     setName(product.name);
     setPrice(product.price.toString());
     setOriginalPrice(product.originalPrice?.toString() || '');
-    setImage(product.image);
+    setImages(product.images);
     setDescription(product.description);
     setCategory(product.category || '');
     setStock(product.stock?.toString() || '100');
@@ -113,8 +113,8 @@ const AdminProducts = () => {
               setPrice={setPrice}
               originalPrice={originalPrice}
               setOriginalPrice={setOriginalPrice}
-              image={image}
-              setImage={setImage}
+              images={images}
+              setImages={setImages}
               description={description}
               setDescription={setDescription}
               category={category}
@@ -144,7 +144,7 @@ const AdminProducts = () => {
               <TableRow key={product.id}>
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    <img src={product.image} alt={product.name} className="w-8 h-8 rounded" />
+                    <img src={product?.images[0]} alt={product.name} className="w-8 h-8 rounded" />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -201,8 +201,8 @@ const AdminProducts = () => {
             setPrice={setPrice}
             originalPrice={originalPrice}
             setOriginalPrice={setOriginalPrice}
-            image={image}
-            setImage={setImage}
+            images={images}
+            setImages={setImages}
             description={description}
             setDescription={setDescription}
             category={category}

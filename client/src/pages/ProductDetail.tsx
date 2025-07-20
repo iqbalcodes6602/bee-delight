@@ -76,14 +76,6 @@ const ProductDetail = () => {
 
   const { averageRating, totalReviews } = getProductRating();
 
-  // Mock multiple images for carousel
-  const productImages = [
-    '/p1.webp',
-    '/p2.webp',
-    '/p3.png',
-    '/p4.png',
-  ];
-
   const sizes = [
     { name: "8oz", price: product.price * 0.75 },
     { name: "12oz", price: product.price },
@@ -95,11 +87,11 @@ const ProductDetail = () => {
   const totalPrice = selectedSizePrice * quantity;
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
+    setCurrentImageIndex((prev) => (prev + 1) % product?.images?.length);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+    setCurrentImageIndex((prev) => (prev - 1 + product?.images?.length) % product?.images?.length);
   };
 
   const handleAddToCart = () => {
@@ -107,7 +99,7 @@ const ProductDetail = () => {
       id: product.id,
       name: product.name,
       price: selectedSizePrice,
-      image: product.image,
+      images: product.images,
       size: selectedSize
     });
     
@@ -165,7 +157,7 @@ const ProductDetail = () => {
         id: product.id,
         name: product.name,
         price: product.price,
-        image: product.image
+        images: product.images
       });
       toast({
         title: "Added to wishlist!",
@@ -196,13 +188,13 @@ const ProductDetail = () => {
             <div className="relative mb-6 bg-gradient-to-br from-amber-50 to-yellow-50 p-8 aspect-square rounded-lg overflow-hidden">
               <div className="w-full h-full">
                 <img
-                  src={productImages[currentImageIndex]}
+                  src={product?.images[currentImageIndex]}
                   alt="Product"
                   className="w-full h-full object-cover rounded-lg"
                 />
               </div>
 
-              {productImages.length > 1 && (
+              {product?.images?.length > 1 && (
                 <>
                   <Button
                     variant="ghost"
@@ -234,8 +226,8 @@ const ProductDetail = () => {
             </div>
 
             {/* Image Thumbnails */}
-            <div className="flex space-x-2 mb-6">
-              {productImages.map((img, index) => (
+            <div className="flex justify-center space-x-2 mb-6">
+              {product?.images?.map((img, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}

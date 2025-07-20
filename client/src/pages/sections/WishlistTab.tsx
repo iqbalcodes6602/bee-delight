@@ -26,7 +26,7 @@ export const WishlistTab = () => {
       id: item.id,
       name: item.name,
       price: item.price,
-      image: item.image
+      images: item.images
     });
     toast({
       title: "Added to cart!",
@@ -78,7 +78,7 @@ export const WishlistTab = () => {
               <div key={item.id} className="border rounded-lg p-4">
                 <div className="text-center bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded mb-3">
                   <img 
-                    src={item.image} 
+                    src={item.images[0]} 
                     alt={item.name} 
                     className="w-full h-32 object-contain mx-auto"
                   />

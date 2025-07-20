@@ -65,7 +65,7 @@ const Cart = () => {
                 <div key={`${item.id}-${item.size}`} className={`p-6 ${index !== items.length - 1 ? 'border-b' : ''}`}>
                   <div className="flex items-center space-x-4">
                     <div className="w-20 h-20 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-lg flex items-center justify-center text-2xl">
-                      <img src={item.image} />
+                      <img src={item.images[0]} />
                     </div>
                     
                     <div className="flex-1">

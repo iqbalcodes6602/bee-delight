@@ -13,7 +13,7 @@ interface ProductCardProps {
     name: string;
     price: number;
     originalPrice?: number;
-    image: string;
+    images: Array<string>;
     rating: number;
     reviews: number;
     description: string;
@@ -36,7 +36,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image
+      images: product?.images[0]
     });
     
     toast({
@@ -60,7 +60,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         id: product.id,
         name: product.name,
         price: product.price,
-        image: product.image
+        images: product?.images[0]
       });
       toast({
         title: "Added to wishlist!",
@@ -76,8 +76,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* Image container */}
         <div className="relative bg-gradient-to-br from-amber-50 to-yellow-50 p-8 aspect-square">
           <div className="text-6xl text-center">
-            {/* {product.image} */}
-            <img src={product.image} style={{borderRadius: '10px'}} />
+            <img src={product?.images[0]} style={{borderRadius: '10px'}} />
           </div>
           
           {/* Badge */}

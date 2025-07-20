@@ -169,7 +169,10 @@ const seedProducts = async () => {
         description: 'Our signature wildflower honey is harvested from pristine meadows, offering a complex floral bouquet with notes of clover, dandelion, and wildflowers. This raw, unfiltered honey retains all its natural enzymes and nutrients.',
         price: 24.99,
         originalPrice: 29.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg' // Add more image links if needed
+        ],
         category: 'raw-honey',
         stock: 50,
         badge: 'bestseller',
@@ -182,7 +185,10 @@ const seedProducts = async () => {
         description: 'Light, delicate acacia honey with a mild, sweet flavor. This premium organic honey is perfect for tea, baking, or enjoying straight from the jar. Slow to crystallize and beautifully clear.',
         price: 32.99,
         originalPrice: 39.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'organic-honey',
         stock: 30,
         badge: 'organic',
@@ -195,7 +201,10 @@ const seedProducts = async () => {
         description: 'Premium New Zealand Manuka honey with UMF 15+ rating. Known for its unique antibacterial properties and rich, earthy flavor. Perfect for wellness and therapeutic use.',
         price: 89.99,
         originalPrice: 109.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'raw-honey',
         stock: 15,
         badge: 'premium',
@@ -207,7 +216,10 @@ const seedProducts = async () => {
         name: 'Lavender Infused Honey',
         description: 'Delicate honey infused with organic lavender flowers. This aromatic honey offers a floral, calming flavor perfect for evening tea or drizzling over desserts.',
         price: 28.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'flavored-honey',
         stock: 25,
         badge: 'new',
@@ -219,7 +231,10 @@ const seedProducts = async () => {
         name: 'Cinnamon Spiced Honey',
         description: 'Warm, comforting honey blended with Ceylon cinnamon. Perfect for adding a spicy-sweet touch to your morning oatmeal, toast, or hot beverages.',
         price: 26.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'flavored-honey',
         stock: 35,
         rating: 4.5,
@@ -231,7 +246,10 @@ const seedProducts = async () => {
         description: 'Natural skincare made with our pure honey and organic oats. This gentle exfoliating mask leaves skin soft, smooth, and naturally glowing.',
         price: 19.99,
         originalPrice: 24.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'honey-products',
         stock: 40,
         badge: 'sale',
@@ -243,7 +261,10 @@ const seedProducts = async () => {
         name: 'Honey Lip Balm Set',
         description: 'Set of 3 nourishing lip balms made with our pure honey, beeswax, and essential oils. Flavors include vanilla, mint, and original honey.',
         price: 15.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'honey-products',
         stock: 60,
         rating: 4.3,
@@ -255,7 +276,10 @@ const seedProducts = async () => {
         description: 'Classic American clover honey with a mild, sweet flavor. This versatile honey is perfect for everyday use in cooking, baking, and sweetening beverages.',
         price: 18.99,
         originalPrice: 22.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'raw-honey',
         stock: 45,
         rating: 4.2,
@@ -267,7 +291,10 @@ const seedProducts = async () => {
         description: 'Perfect gift set featuring 4 mini jars of our finest honey varieties: Wildflower, Acacia, Orange Blossom, and Buckwheat. Beautifully packaged with tasting notes.',
         price: 49.99,
         originalPrice: 59.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'gift-sets',
         stock: 20,
         badge: 'bestseller',
@@ -279,7 +306,10 @@ const seedProducts = async () => {
         name: 'Orange Blossom Honey',
         description: 'Fragrant honey with delicate citrus notes from orange blossoms. Light amber color with a fresh, floral taste that pairs beautifully with cheese and fruit.',
         price: 27.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'raw-honey',
         stock: 28,
         rating: 4.6,
@@ -290,7 +320,10 @@ const seedProducts = async () => {
         name: 'Buckwheat Honey',
         description: 'Dark, robust honey with a rich, molasses-like flavor. High in antioxidants and minerals, this distinctive honey is prized by connoisseurs for its bold taste.',
         price: 31.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'raw-honey',
         stock: 22,
         rating: 4.1,
@@ -301,7 +334,10 @@ const seedProducts = async () => {
         name: 'Honey Granola',
         description: 'Artisanal granola made with our pure honey, organic oats, nuts, and dried fruits. Perfect for breakfast or as a healthy snack.',
         price: 12.99,
-        image: 'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+        images: [
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg',
+          'https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg'
+        ],
         category: 'honey-products',
         stock: 55,
         rating: 4.4,

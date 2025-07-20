@@ -6,7 +6,7 @@ interface CartItem {
   id: string;  // note: backend uses string ObjectId
   name: string;
   price: number;
-  image: string;
+  images: Array<string>;
   quantity: number;
   size?: string;
 }

@@ -10,7 +10,7 @@ const getOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id })
       .sort({ createdAt: -1 })
-      .populate('orderItems.product', 'name image');
+      .populate('orderItems.product', 'name images');
 
     const formattedOrders = orders.map(order => ({
       id: order._id,
@@ -49,7 +49,7 @@ const getOrders = async (req, res) => {
 const getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate('orderItems.product', 'name image');
+      .populate('orderItems.product', 'name images');
 
     if (!order) {
       return res.status(404).json({

@@ -8,7 +8,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
-  image?: string;
+  images?: Array<string>;
 }
 
 interface Order {

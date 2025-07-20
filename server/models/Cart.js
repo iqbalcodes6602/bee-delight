@@ -63,7 +63,7 @@ cartSchema.methods.calculateTotals = function() {
 cartSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'items.product',
-    select: 'name price image stock'
+    select: 'name price images stock'
   });
   next();
 });
