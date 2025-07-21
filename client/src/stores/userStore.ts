@@ -33,6 +33,8 @@ interface UserState {
   deleteAddress: (addressId: string) => Promise<void>;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const useUserStore = create<UserState>()(
   persist(
     (set, get) => ({
@@ -48,7 +50,7 @@ export const useUserStore = create<UserState>()(
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const res = await axios.get('http://localhost:5000/api/users/profile', {
+          const res = await axios.get(`${API_BASE_URL}/api/users/profile`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -72,7 +74,7 @@ export const useUserStore = create<UserState>()(
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const res = await axios.put('http://localhost:5000/api/users/profile', data, {
+          const res = await axios.put(`${API_BASE_URL}/api/users/profile`, data, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -106,7 +108,7 @@ export const useUserStore = create<UserState>()(
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const res = await axios.get('http://localhost:5000/api/users/addresses', {
+          const res = await axios.get(`${API_BASE_URL}/api/users/addresses`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -130,7 +132,7 @@ export const useUserStore = create<UserState>()(
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const res = await axios.post('http://localhost:5000/api/users/addresses', data, {
+          const res = await axios.post(`${API_BASE_URL}/api/users/addresses`, data, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -164,7 +166,7 @@ export const useUserStore = create<UserState>()(
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const res = await axios.delete(`http://localhost:5000/api/users/addresses/${addressId}`, {
+          const res = await axios.delete(`${API_BASE_URL}/api/users/addresses/${addressId}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }

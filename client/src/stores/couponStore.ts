@@ -24,21 +24,24 @@ interface CouponState {
   useCoupon: (code: string) => Promise<void>;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem('token');
 
 export const useCouponStore = create<CouponState>((set, get) => ({
   coupons: [],
 
+  // Fetch all coupons
   fetchCoupons: async () => {
-    const res = await fetch('http://localhost:5000/api/coupons', {
+    const res = await fetch(`${API_BASE_URL}/api/coupons`, {
       headers: { Authorization: `Bearer ${token}`},
     });
     const data = await res.json();
     set({ coupons: data.coupons });
   },
 
+  // Add a new coupon
   addCoupon: async (coupon) => {
-    await fetch('http://localhost:5000/api/coupons', {
+    await fetch(`${API_BASE_URL}/api/coupons`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -49,8 +52,9 @@ export const useCouponStore = create<CouponState>((set, get) => ({
     await get().fetchCoupons();
   },
 
+  // Update an existing coupon
   updateCoupon: async (id, updatedCoupon) => {
-    await fetch(`http://localhost:5000/api/coupons/${id}`, {
+    await fetch(`${API_BASE_URL}/api/coupons/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -61,8 +65,9 @@ export const useCouponStore = create<CouponState>((set, get) => ({
     await get().fetchCoupons();
   },
 
+  // Delete a coupon
   deleteCoupon: async (id) => {
-    await fetch(`http://localhost:5000/api/coupons/${id}`, {
+    await fetch(`${API_BASE_URL}/api/coupons/${id}`, {
       method: 'DELETE',
       headers: { 
         Authorization: `Bearer ${token}`
@@ -71,8 +76,9 @@ export const useCouponStore = create<CouponState>((set, get) => ({
     await get().fetchCoupons();
   },
 
+  // Validate a coupon code against an order amount
   validateCoupon: async (code, orderAmount) => {
-    const res = await fetch('http://localhost:5000/api/coupons/validate', {
+    const res = await fetch(`${API_BASE_URL}/api/coupons/validate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -84,8 +90,9 @@ export const useCouponStore = create<CouponState>((set, get) => ({
     return { valid: data.valid, discount: data.discount, message: data.message };
   },
 
+  // Use a coupon code
   useCoupon: async (code) => {
-    await fetch('http://localhost:5000/api/coupons/use', {
+    await fetch(`${API_BASE_URL}/api/coupons/use`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

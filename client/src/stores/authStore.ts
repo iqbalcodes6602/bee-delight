@@ -20,16 +20,18 @@ interface AuthState {
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
       isAuthenticated: false,
+
+      // User login
       login: async (email: string, password: string) => {
         try {
-          const res = await fetch(`${API_BASE}/auth/login`, {
+          const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -60,9 +62,11 @@ export const useAuthStore = create<AuthState>()(
           return false;
         }
       },
+
+      // User registration
       register: async (email: string, password: string, name: string) => {
         try {
-          const res = await fetch(`${API_BASE}/auth/register`, {
+          const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -94,13 +98,14 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       
+      // Change user password
       changePassword: async (currentPassword, newPassword) => {
         try {
           const token = localStorage.getItem('token');
           if (!token) throw new Error('No authentication token found');
           
           const response = await axios.put(
-            'http://localhost:5000/api/auth/password',
+            `${API_BASE_URL}/api/api/auth/password`,
             {
               currentPassword,
               newPassword
@@ -130,12 +135,14 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
+
+      // User logout
       logout: async () => {
         try {
           const token = localStorage.getItem("token");
 
           if (token) {
-            await fetch(`${API_BASE}/auth/logout`, {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
               method: "POST",
               headers: {
                 Authorization: `Bearer ${token}`,

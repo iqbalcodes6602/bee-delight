@@ -20,27 +20,31 @@ interface ReviewState {
   getProductRating: () => { averageRating: number; totalReviews: number };
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem('token');
 
 export const useReviewStore = create<ReviewState>((set, get) => ({
   reviews: [],
 
+  // Fetch reviews for a specific product
   fetchReviews: async (productId: string) => {
-    const response = await axios.get(`http://localhost:5000/api/reviews/product/${productId}`, {
+    const response = await axios.get(`${API_BASE_URL}/api/reviews/product/${productId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     set({ reviews: response.data.reviews });
   },
 
+  // Fetch all reviews
   fetchAllReviews: async () => {
-    const response = await axios.get(`http://localhost:5000/api/reviews`, {
+    const response = await axios.get(`${API_BASE_URL}/api/reviews`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     set({ reviews: response.data.reviews });
   },
 
+  // Add a new review
   addReview: async (review) => {
-    const response = await axios.post(`http://localhost:5000/api/reviews`, review, {
+    const response = await axios.post(`${API_BASE_URL}/api/reviews`, review, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
@@ -51,8 +55,9 @@ export const useReviewStore = create<ReviewState>((set, get) => ({
     }));
   },
 
+  // Delete a review
   deleteReview: async (id: string) => {
-    await axios.delete(`http://localhost:5000/api/reviews/${id}`, {
+    await axios.delete(`${API_BASE_URL}/api/reviews/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     set((state) => ({
@@ -60,6 +65,7 @@ export const useReviewStore = create<ReviewState>((set, get) => ({
     }));
   },
 
+  // Calculate average rating and total reviews for the product
   getProductRating: () => {
     const reviews = get().reviews;
     if (reviews.length === 0) return { averageRating: 0, totalReviews: 0 };

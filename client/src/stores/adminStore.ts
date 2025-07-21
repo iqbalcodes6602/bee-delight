@@ -61,6 +61,8 @@ interface AdminState {
   fetchStats: () => Promise<void>;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const useAdminStore = create<AdminState>()(
   persist(
     (set, get) => ({
@@ -70,13 +72,14 @@ export const useAdminStore = create<AdminState>()(
       loading: false,
       error: null,
 
+      // Fetch all users
       fetchUsers: async () => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const res = await axios.get('http://localhost:5000/api/admin/users', {
+          const res = await axios.get(`${API_BASE_URL}/api/admin/users`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.data.success) set({ users: res.data.users });
@@ -88,13 +91,14 @@ export const useAdminStore = create<AdminState>()(
         }
       },
 
+      // Update user details
       updateUser: async (id, data) => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          await axios.put(`http://localhost:5000/api/admin/users/${id}`, data, {
+          await axios.put(`${API_BASE_URL}/api/admin/users/${id}`, data, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -118,13 +122,14 @@ export const useAdminStore = create<AdminState>()(
         }
       },
 
+      // Delete a user
       deleteUser: async (id) => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+          await axios.delete(`${API_BASE_URL}/api/admin/users/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           useToast().toast({
@@ -145,13 +150,14 @@ export const useAdminStore = create<AdminState>()(
         }
       },
 
+      // Fetch all orders
       fetchOrders: async () => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const res = await axios.get('http://localhost:5000/api/admin/orders', {
+          const res = await axios.get(`${API_BASE_URL}/api/admin/orders`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.data.success) set({ orders: res.data.orders });
@@ -163,13 +169,14 @@ export const useAdminStore = create<AdminState>()(
         }
       },
 
+      // Fetch admin stats
       fetchStats: async () => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const res = await axios.get('http://localhost:5000/api/admin/stats', {
+          const res = await axios.get(`${API_BASE_URL}/api/admin/stats`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.data.success) set({ stats: res.data.stats });

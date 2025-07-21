@@ -21,6 +21,8 @@ interface CartState {
   clearCart: () => Promise<void>;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
@@ -30,7 +32,7 @@ export const useCartStore = create<CartState>()(
       // fetch entire cart from backend
       fetchCart: async () => {
         try {
-          const res = await axios.get(`http://localhost:5000/api/cart`, {
+          const res = await axios.get(`${API_BASE_URL}/api/cart`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`
             }
@@ -51,7 +53,7 @@ export const useCartStore = create<CartState>()(
       addItem: async (product, quantity, size) => {
         try {
           await axios.post(
-            `http://localhost:5000/api/cart/items`,
+            `${API_BASE_URL}/api/cart/items`,
             { productId: product.id, quantity, size },
             {
               headers: {
@@ -70,7 +72,7 @@ export const useCartStore = create<CartState>()(
       updateQuantity: async (id, quantity) => {
         try {
           await axios.put(
-            `http://localhost:5000/api/cart/items/${id}`,
+            `${API_BASE_URL}api/cart/items/${id}`,
             { quantity },
             {
               headers: {
@@ -88,7 +90,7 @@ export const useCartStore = create<CartState>()(
       removeItem: async (id) => {
         try {
           await axios.delete(
-            `http://localhost:5000/api/cart/items/${id}`,
+            `${API_BASE_URL}/api/cart/items/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -110,7 +112,7 @@ export const useCartStore = create<CartState>()(
       clearCart: async () => {
         try {
           await axios.delete(
-            `http://localhost:5000/api/cart`,
+            `${API_BASE_URL}/api/cart`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`

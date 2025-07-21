@@ -30,7 +30,7 @@ interface ProductState {
   getProduct: (id: string) => Promise<Product | undefined>;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
@@ -38,6 +38,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
   loading: false,
   error: null,
 
+  // Fetch products with optional parameters
   fetchProducts: async (params = {}) => {
     try {
       const token = localStorage.getItem("token");
@@ -49,7 +50,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
       if (params.sortBy) query.append("sortBy", params.sortBy);
       if (params.sortOrder) query.append("sortOrder", params.sortOrder);
 
-      const res = await fetch(`${API_BASE}/products?${query.toString()}`, {
+      const res = await fetch(`${API_BASE_URL}/api/products?${query.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -63,10 +64,11 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
+  // Add a new product
   addProduct: async (product) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/products`, {
+      const res = await fetch(`${API_BASE_URL}/api/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,10 +89,11 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
+  // Update an existing product
   updateProduct: async (id, updates) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/products/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -113,10 +116,11 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
+  // Delete a product
   deleteProduct: async (id) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/products/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -135,12 +139,13 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
+  // Get a specific product by ID
   getProduct: async (id: string) => {
     set({ loading: true, error: null, currentProduct: null });
     
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE}/products/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         headers: { 
           Authorization: `Bearer ${token}` 
         }

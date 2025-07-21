@@ -23,34 +23,38 @@ interface BlogState {
   getPublishedPosts: () => BlogPost[];
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const token = localStorage.getItem("token");
 
 export const useBlogStore = create<BlogState>((set, get) => ({
   posts: [],
 
+  // Fetch all published blog posts
   fetchPublishedPosts: async () => {
-    const { data } = await axios.get("http://localhost:5000/api/blog/posts");
+    const { data } = await axios.get(`${API_BASE_URL}/api/blog/posts`);
     set({ posts: data.posts });
   },
 
+  // Fetch all blog posts for admin
   fetchAdminPosts: async () => {
-    const { data } = await axios.get("http://localhost:5000/api/blog/posts/admin", {
+    const { data } = await axios.get(`${API_BASE_URL}/api/blog/posts/admin`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     set({ posts: data.posts });
   },
 
+  // Create a new blog post
   createPost: async (post) => {
-    const { data } = await axios.post("http://localhost:5000/api/blog/posts", post, {
+    const { data } = await axios.post(`${API_BASE_URL}/api/blog/posts`, post, {
       headers: { Authorization: `Bearer ${token}` },
     });
     set((state) => ({ posts: [...state.posts, data.post] }));
   },
 
+  // Update an existing blog post
   updatePost: async (id, updatedPost) => {
-    const { data } = await axios.put(`http://localhost:5000/api/blog/posts/${id}`, updatedPost, {
+    const { data } = await axios.put(`${API_BASE_URL}/api/blog/posts/${id}`, updatedPost, {
       headers: { Authorization: `Bearer ${token}` },
     });
     set((state) => ({
@@ -60,8 +64,9 @@ export const useBlogStore = create<BlogState>((set, get) => ({
     }));
   },
 
+  // Delete a blog post
   deletePost: async (id) => {
-    await axios.delete(`http://localhost:5000/api/blog/posts/${id}`, {
+    await axios.delete(`${API_BASE_URL}/api/blog/posts/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     set((state) => ({
@@ -69,10 +74,12 @@ export const useBlogStore = create<BlogState>((set, get) => ({
     }));
   },
 
+  // Get a single blog post by ID
   getPost: (id) => {
     return get().posts.find((post) => post.id === id);
   },
 
+  // Get all published blog posts
   getPublishedPosts: () => {
     return get().posts;
   },

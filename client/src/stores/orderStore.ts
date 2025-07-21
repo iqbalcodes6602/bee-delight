@@ -45,6 +45,8 @@ interface OrderState {
   updateOrderStatus: (orderId: string, status: Order['status']) => Promise<void>;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const useOrderStore = create<OrderState>()(
   persist(
     (set, get) => ({
@@ -53,13 +55,14 @@ export const useOrderStore = create<OrderState>()(
       loading: false,
       error: null,
 
+      // Fetch user orders
       fetchAdminOrders: async () => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const response = await axios.get('http://localhost:5000/api/admin/orders', {
+          const response = await axios.get(`${API_BASE_URL}/api/admin/orders`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -80,13 +83,14 @@ export const useOrderStore = create<OrderState>()(
         }
       },
 
+      // Fetch user orders
       fetchOrders: async (userId) => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem('token');
           if (!token) return;
 
-          const response = await axios.get('http://localhost:5000/api/orders', {
+          const response = await axios.get(`${API_BASE_URL}/api/orders`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -107,13 +111,14 @@ export const useOrderStore = create<OrderState>()(
         }
       },
 
+      // Get a specific order by ID
       getOrder: async (orderId) => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem('token');
           if (!token) return null;
 
-          const response = await axios.get(`http://localhost:5000/api/orders/${orderId}`, {
+          const response = await axios.get(`${API_BASE_URL}/api/orders/${orderId}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -136,6 +141,7 @@ export const useOrderStore = create<OrderState>()(
         }
       },
 
+      // Create a new order
       createOrder: async (items, total, shippingAddress, couponCode) => {
         set({ loading: true, error: null });
         try {
@@ -143,7 +149,7 @@ export const useOrderStore = create<OrderState>()(
           if (!token) throw new Error('No authentication token found');
 
           const response = await axios.post(
-            'http://localhost:5000/api/orders',
+            `${API_BASE_URL}/api/orders`,
             {
               items,
               total,
@@ -195,6 +201,7 @@ export const useOrderStore = create<OrderState>()(
         }
       },
 
+      // Update order status
       updateOrderStatus: async (orderId, status) => {
         set({ loading: true, error: null });
         try {
@@ -202,7 +209,7 @@ export const useOrderStore = create<OrderState>()(
           if (!token) throw new Error('No authentication token found');
 
           const response = await axios.put(
-            `http://localhost:5000/api/orders/${orderId}/status`,
+            `${API_BASE_URL}/api/orders/${orderId}/status`,
             { status },
             {
               headers: {
